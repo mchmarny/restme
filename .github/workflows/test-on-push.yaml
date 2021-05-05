@@ -1,0 +1,56 @@
+name: Push and PR Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Setup
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.16
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Tidy
+      run: |
+        make tidy
+
+    - name: Lint
+      uses: golangci/golangci-lint-action@v2
+      with:
+        version: v1.38
+        args: --config .github/linters.yml --timeout 3m
+
+    - name: Test
+      env:
+        STATE_CONFIG: ${{ secrets.FIRESTORE_CONFIG }}
+      run: |
+        make test
+
+    - name: Variables
+      run: |
+        echo "IMG_VERSION=$(make version)" >> $GITHUB_ENV
+        echo "BUILD_TIME=$(make time)" >> $GITHUB_ENV
+
+    - name: Image
+      uses: docker/build-push-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        dockerfile: ./build/Dockerfile
+        tags: ${{ env.IMG_VERSION }},latest
+        build_args: APP_VERSION=${{ env.IMG_VERSION }},BUILD_TIME=${{ env.BUILD_TIME }}
+        
+        

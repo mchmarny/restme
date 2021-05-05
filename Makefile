@@ -1,0 +1,55 @@
+RELEASE_VERSION  ?=v0.0.1
+
+all: help
+
+version: ## Outputs current verison
+	@echo $(RELEASE_VERSION)
+.PHONY: version
+
+time: ## Outputs build time
+	@echo $(shell date -u +"BUILD_TIME=%Y-%m-%dT%T-UTC")
+.PHONY: time
+
+tidy: ## Updates the go modules and vendors all dependancies 
+	go mod tidy
+	go mod vendor
+.PHONY: tidy
+
+test: ## Runs tests on the entire project 
+	go test -count=1 -race -covermode=atomic -coverprofile=cover.out ./...
+.PHONY: test
+
+lint: ## Lints the entire project 
+	golangci-lint -c .github/linters.yml run --timeout=3m
+.PHONY: lint
+
+run: ## Runs uncompiled Go code
+	go run ./cmd/main.go
+.PHONY: run
+
+echo: ## Invokes echo service 
+	curl -i -H "Content-Type: application/json" \
+		http://localhost:8080/v1/echo \
+		-d '{ "on": 1620253683, "msg": "hellow" }'
+.PHONY: echo
+
+upgrade: ## Upgrades all dependancies 
+	go get -u ./...
+	go mod tidy 
+.PHONY: upgrade
+
+tag: ## Creates release tag 
+	git tag $(RELEASE_VERSION)
+	git push origin $(RELEASE_VERSION)
+.PHONY: tag
+
+clean: ## Cleans bin and temp directories
+	go clean
+	rm -fr ./vendor
+	rm -fr ./bin
+.PHONY: clean
+
+help: ## Display available commands
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk \
+		'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+.PHONY: help
