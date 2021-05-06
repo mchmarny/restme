@@ -18,7 +18,7 @@ test: ## Runs tests on the entire project
 .PHONY: test
 
 lint: ## Lints the entire project 
-	golangci-lint -c .github/linters.yml run --timeout=3m
+	golangci-lint -c .golangci.yaml run --timeout=3m
 .PHONY: lint
 
 run: ## Runs uncompiled Go code

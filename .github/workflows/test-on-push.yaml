@@ -30,7 +30,7 @@ jobs:
       uses: golangci/golangci-lint-action@v2
       with:
         version: v1.38
-        args: --config .github/linters.yml --timeout 3m
+        args: --config .golangci.yaml --timeout 3m
 
     - name: Test
       run: |
