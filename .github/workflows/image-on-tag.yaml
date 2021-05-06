@@ -41,4 +41,4 @@ jobs:
     - name: Publish 
       run: |
         KO_DOCKER_REPO=ghcr.io/$GITHUB_REPOSITORY \
-          ko publish ./cmd/ --bare --tags ${{ env.IMG_VERSION }},latest
+          ko publish ./cmd/ --bare --tags ${{ env.RELEASE_VERSION }},latest
