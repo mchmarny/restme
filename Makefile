@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.0.2
+RELEASE_VERSION  ?=v0.0.3
 KO_DOCKER_REPO   ?=ghcr.io/mchmarny
 
 all: help
@@ -7,10 +7,6 @@ all: help
 version: ## Outputs current verison
 	@echo $(RELEASE_VERSION)
 .PHONY: version
-
-time: ## Outputs build time
-	@echo $(shell date -u +"BUILD_TIME=%Y-%m-%dT%T-UTC")
-.PHONY: time
 
 tidy: ## Updates the go modules and vendors all dependancies 
 	go mod tidy

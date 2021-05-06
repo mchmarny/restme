@@ -33,24 +33,11 @@ jobs:
         args: --config .github/linters.yml --timeout 3m
 
     - name: Test
-      env:
-        STATE_CONFIG: ${{ secrets.FIRESTORE_CONFIG }}
       run: |
         make test
 
     - name: Variables
       run: |
-        echo "IMG_VERSION=$(make version)" >> $GITHUB_ENV
-        echo "BUILD_TIME=$(make time)" >> $GITHUB_ENV
-
-    - name: Image
-      uses: docker/build-push-action@v1
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        dockerfile: ./build/Dockerfile
-        tags: ${{ env.IMG_VERSION }},latest
-        build_args: APP_VERSION=${{ env.IMG_VERSION }},BUILD_TIME=${{ env.BUILD_TIME }}
+        echo "RELEASE_VERSION=$(make version)" >> $GITHUB_ENV
         
         
