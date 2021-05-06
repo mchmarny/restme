@@ -30,15 +30,15 @@ func main() {
 
 	// echo
 	echoHandler := handler.NewEchoHandler(logger)
-	mux.Handle(echoHandler.Path, echoHandler)
+	mux.Handle("/v1/echo", echoHandler)
 
 	// resource
 	resourceHandler := handler.NewResourceHandler(logger)
-	mux.Handle(resourceHandler.Path, resourceHandler)
+	mux.Handle("/v1/resource", resourceHandler)
 
 	// request
 	requestHandler := handler.NewRequestHandler(logger)
-	mux.Handle(requestHandler.Path, requestHandler)
+	mux.Handle("/v1/request", requestHandler)
 
 	s := &http.Server{
 		Addr:     address,

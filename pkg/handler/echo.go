@@ -7,20 +7,14 @@ import (
 	"net/http"
 )
 
-const (
-	echoHandlerPath = "/v1/echo"
-)
-
 func NewEchoHandler(logger *log.Logger) EchoHandler {
 	return EchoHandler{
 		logger: logger,
-		Path:   echoHandlerPath,
 	}
 }
 
 type EchoHandler struct {
 	logger *log.Logger
-	Path   string
 }
 
 type message struct {
@@ -30,11 +24,6 @@ type message struct {
 
 func (h EchoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.logger.Printf("serving: %+v", r)
-
-	if r.URL.Path != h.Path {
-		handleError(w, http.StatusNotFound, "Expected: %s, got:%s", h.Path, r.URL.Path)
-		return
-	}
 
 	contentType := r.Header.Get("Content-Type")
 	if contentType != contentTypeJSON {

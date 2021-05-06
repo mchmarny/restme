@@ -12,10 +12,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const (
-	requestHandlerPath = "/v1/request"
-)
-
 // Request represents simple HTTP resource
 type Request struct {
 	Request *RequestMetadata       `json:"request,omitempty"`
@@ -35,22 +31,15 @@ type RequestMetadata struct {
 func NewRequestHandler(logger *log.Logger) RequestHandler {
 	return RequestHandler{
 		logger: logger,
-		Path:   requestHandlerPath,
 	}
 }
 
 type RequestHandler struct {
 	logger *log.Logger
-	Path   string
 }
 
 func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.logger.Printf("serving: %+v", r)
-
-	if r.URL.Path != h.Path {
-		handleError(w, http.StatusNotFound, "Expected: %s, got:%s", h.Path, r.URL.Path)
-		return
-	}
 
 	result := &Request{
 		Request: getRequestMetadata(r),

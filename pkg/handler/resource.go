@@ -8,20 +8,14 @@ import (
 	"github.com/mchmarny/restme/pkg/kube"
 )
 
-const (
-	resourceHandlerPath = "/v1/resource"
-)
-
 func NewResourceHandler(logger *log.Logger) ResourceHandler {
 	return ResourceHandler{
 		logger: logger,
-		Path:   resourceHandlerPath,
 	}
 }
 
 type ResourceHandler struct {
 	logger *log.Logger
-	Path   string
 }
 
 // Resource represents simple Kube resource
@@ -34,11 +28,6 @@ type Resource struct {
 
 func (h ResourceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.logger.Printf("serving: %+v", r)
-
-	if r.URL.Path != h.Path {
-		handleError(w, http.StatusNotFound, "Expected: %s, got:%s", h.Path, r.URL.Path)
-		return
-	}
 
 	result := &Resource{
 		Request:   getRequestMetadata(r),
