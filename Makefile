@@ -1,4 +1,6 @@
+SERVICE_NAME     ?=restme
 RELEASE_VERSION  ?=v0.0.1
+KO_DOCKER_REPO   ?=ghcr.io/mchmarny
 
 all: help
 
@@ -27,16 +29,20 @@ run: ## Runs uncompiled Go code
 	go run ./cmd/main.go
 .PHONY: run
 
-echo: ## Invokes echo service 
+message: ## Invokes echo service 
 	curl -i -H "Content-Type: application/json" \
 		http://localhost:8080/v1/echo \
 		-d '{ "on": 1620253683, "msg": "hellow" }'
-.PHONY: echo
+.PHONY: message
 
 upgrade: ## Upgrades all dependancies 
 	go get -u ./...
 	go mod tidy 
 .PHONY: upgrade
+
+image: ## Creates container image using ko
+	KO_DOCKER_REPO=$(KO_DOCKER_REPO)/$(SERVICE_NAME) ko publish ./cmd/ --bare --tags $(RELEASE_VERSION),latest
+.PHONY: tag
 
 tag: ## Creates release tag 
 	git tag $(RELEASE_VERSION)

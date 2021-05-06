@@ -25,11 +25,21 @@ var (
 func main() {
 	mux := http.NewServeMux()
 
+	// default
 	defaultHandler := handler.NewDefaultHandler(logger)
-	mux.Handle("/", defaultHandler)
+	mux.Handle(defaultHandler.Path, defaultHandler)
 
+	// echo
 	echoHandler := handler.NewEchoHandler(logger)
-	mux.Handle("/v1/echo", echoHandler)
+	mux.Handle(echoHandler.Path, echoHandler)
+
+	// resource
+	resourceHandler := handler.NewResourceHandler(logger)
+	mux.Handle(resourceHandler.Path, resourceHandler)
+
+	// request
+	requestHandler := handler.NewRequestHandler(logger)
+	mux.Handle(requestHandler.Path, requestHandler)
 
 	s := &http.Server{
 		Addr:     address,
