@@ -26,7 +26,7 @@ func GetLimits() *ResourceInfo {
 
 	// pod memory
 	val, wr, ctx := getCGroupsFile(limitMemResourceFile)
-	limit.RAM.Value = val
+	limit.RAM.Value = byteSize(uint64(val))
 	limit.RAM.Context = fmt.Sprintf("%s, writable: %v, size: %s", ctx, wr, byteSize(uint64(val)))
 
 	// pod cpu (calculated: quota / period)
