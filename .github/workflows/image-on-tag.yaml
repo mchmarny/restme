@@ -36,9 +36,9 @@ jobs:
     - name: Variables
       run: |
         echo "RELEASE_VERSION=$(make version)" >> $GITHUB_ENV
+        echo "KO_DOCKER_REPO="ghcr.io/${GITHUB_REPOSITORY}" >> $GITHUB_ENV
         
     - uses: imjasonh/setup-ko@v0.4
     - name: Publish 
       run: |
-        KO_DOCKER_REPO=ghcr.io/${{ env.GITHUB_REPOSITORY }} \
-          ko publish ./cmd/ --bare --tags ${{ env.IMG_VERSION }},latest
+        ko publish ./cmd/ --bare --tags ${{ env.IMG_VERSION }},latest
