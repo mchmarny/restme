@@ -1,12 +1,9 @@
-name: Push and PR Test
+name: Image on Tag
 
-on:
+on:  
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    tags:
+      - 'v*'
   
 jobs:
 
@@ -35,5 +32,13 @@ jobs:
     - name: Test
       run: |
         make test
+
+    - name: Variables
+      run: |
+        echo "RELEASE_VERSION=$(make version)" >> $GITHUB_ENV
         
-        
+    - uses: imjasonh/setup-ko@v0.4
+    - name: Publish 
+      run: |
+        KO_DOCKER_REPO=ghcr.io/${{ env.GITHUB_REPOSITORY }} \
+          ko publish ./cmd/ --bare --tags ${{ env.IMG_VERSION }},latest
