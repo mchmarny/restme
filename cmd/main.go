@@ -26,8 +26,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	// default
-	defaultHandler := handler.NewDefaultHandler(logger)
-	mux.Handle(defaultHandler.Path, defaultHandler)
+	mux.HandleFunc("/", handler.DefaultHandler)
 
 	// echo
 	echoHandler := handler.NewEchoHandler(logger)
