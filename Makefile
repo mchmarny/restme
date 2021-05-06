@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.0.7
+RELEASE_VERSION  ?=v0.0.8
 KO_DOCKER_REPO   ?=ghcr.io/mchmarny
 
 all: help
