@@ -5,8 +5,7 @@ import (
 )
 
 const (
-	contentTypeJSON    = "application/json"
-	defaultHandlerPath = "/"
+	contentTypeJSON = "application/json"
 )
 
 func DefaultHandler(w http.ResponseWriter, r *http.Request) {
