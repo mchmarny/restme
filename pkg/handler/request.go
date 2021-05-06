@@ -18,15 +18,15 @@ const (
 
 // Request represents simple HTTP resource
 type Request struct {
-	Meta    *RequestMetadata       `json:"meta,omitempty"`
-	Headers map[string]interface{} `json:"head"`
-	EnvVars map[string]interface{} `json:"envs"`
+	Request *RequestMetadata       `json:"request,omitempty"`
+	Headers map[string]interface{} `json:"headers"`
+	EnvVars map[string]interface{} `json:"env_vars"`
 }
 
 // RequestMetadata represents metadata of the request
 type RequestMetadata struct {
 	ID     string    `json:"id"`
-	On     time.Time `json:"ts"`
+	On     time.Time `json:"time"`
 	URI    string    `json:"uri"`
 	Host   string    `json:"host"`
 	Method string    `json:"method"`
@@ -53,7 +53,7 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &Request{
-		Meta:    getRequestMetadata(r),
+		Request: getRequestMetadata(r),
 		Headers: make(map[string]interface{}),
 		EnvVars: make(map[string]interface{}),
 	}
@@ -83,8 +83,6 @@ func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		handleError(w, http.StatusInternalServerError, "Error processing request: %v", err)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 func getRequestMetadata(r *http.Request) *RequestMetadata {

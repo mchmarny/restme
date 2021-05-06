@@ -26,9 +26,10 @@ type ResourceHandler struct {
 
 // Resource represents simple Kube resource
 type Resource struct {
-	Meta *RequestMetadata `json:"meta,omitempty"`
-	Node *kube.NodeInfo   `json:"node,omitempty"`
-	Pod  *kube.PodInfo    `json:"pod,omitempty"`
+	Request   *RequestMetadata   `json:"request,omitempty"`
+	Host      *kube.HostInfo     `json:"host,omitempty"`
+	Resources *kube.ResourceInfo `json:"resources,omitempty"`
+	Limits    *kube.ResourceInfo `json:"limits,omitempty"`
 }
 
 func (h ResourceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -40,9 +41,10 @@ func (h ResourceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := &Resource{
-		Meta: getRequestMetadata(r),
-		Node: kube.GetNodeInfo(),
-		Pod:  kube.GetPodInfo(),
+		Request:   getRequestMetadata(r),
+		Host:      kube.GetHostInfo(),
+		Resources: kube.GetResourceInfo(),
+		Limits:    kube.GetLimits(),
 	}
 
 	encoder := json.NewEncoder(w)
@@ -52,6 +54,4 @@ func (h ResourceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		handleError(w, http.StatusInternalServerError, "Error processing request: %v", err)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
