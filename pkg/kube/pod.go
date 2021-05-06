@@ -15,10 +15,16 @@ import (
 	"github.com/jaypipes/ghw"
 )
 
+const (
+	limitMemResourceFile       = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
+	limitCPUPeriodResourceFile = "/sys/fs/cgroup/cpu/cpu.cfs_period_us"
+	limitCPUQuotaResourceFile  = "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
+)
+
 // PodInfo represents pod info
 type PodInfo struct {
-	Hostname string        `json:"hostname,omitempty"`
-	Limits   *ResourceInfo `json:"limits,omitempty"`
+	Host   *host.InfoStat `json:"host,omitempty"`
+	Limits *ResourceInfo  `json:"limits,omitempty"`
 }
 
 // GetPodInfo retreaves pod info
@@ -33,7 +39,7 @@ func GetPodInfo() *PodInfo {
 	// host
 	info, err := host.Info()
 	if err == nil {
-		pod.Hostname = info.Hostname
+		pod.Host = info
 	}
 
 	// pod memory

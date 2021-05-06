@@ -9,12 +9,6 @@ import (
 	"github.com/shirou/gopsutil/mem"
 )
 
-const (
-	limitMemResourceFile       = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
-	limitCPUPeriodResourceFile = "/sys/fs/cgroup/cpu/cpu.cfs_period_us"
-	limitCPUQuotaResourceFile  = "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
-)
-
 // NodeInfo represents host info data
 type NodeInfo struct {
 	ID        string        `json:"hostId,omitempty"`
