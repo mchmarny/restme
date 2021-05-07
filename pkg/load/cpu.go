@@ -8,16 +8,11 @@ import (
 )
 
 type CPULoadResult struct {
-	CPUs       int          `json:"cpus,omitempty"`
-	Operations int64        `json:"operations,omitempty"`
-	Duration   string       `json:"duration,omitempty"`
-	lock       sync.RWMutex `json:"-"`
-}
-
-func (r *CPULoadResult) add() {
-	r.lock.Lock()
-	r.Operations++
-	r.lock.Unlock()
+	Cores      int    `json:"cores,omitempty"`
+	Start      int64  `json:"start,omitempty"`
+	End        int64  `json:"end,omitempty"`
+	Operations int64  `json:"operations,omitempty"`
+	Duration   string `json:"duration,omitempty"`
 }
 
 // String returns the JSON serialized representation of the object
@@ -31,23 +26,39 @@ func MakeCPULoad(duration time.Duration) *CPULoadResult {
 	cores := runtime.NumCPU()
 	runtime.GOMAXPROCS(cores)
 
-	result := &CPULoadResult{
-		Duration: duration.String(),
-		CPUs:     cores,
-		lock:     sync.RWMutex{},
-	}
+	var counter int64
 
+	start := time.Now()
+	lock := sync.RWMutex{}
+	countCh := make(chan bool, cores)
+
+	// load for each test
 	for i := 0; i < cores; i++ {
 		go func() {
 			runtime.LockOSThread()
 			for {
-				result.add()
+				countCh <- true
 			}
 		}()
 	}
 
-	// how long
-	time.Sleep(duration)
+	// count the operations
+	for {
+		<-countCh
+		lock.Lock()
+		counter++
+		lock.Unlock()
 
-	return result
+		if time.Since(start) >= duration {
+			break
+		}
+	}
+
+	return &CPULoadResult{
+		Start:      start.Unix(),
+		End:        time.Now().Unix(),
+		Duration:   duration.String(),
+		Cores:      cores,
+		Operations: counter,
+	}
 }
