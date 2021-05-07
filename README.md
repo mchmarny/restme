@@ -6,6 +6,7 @@ Collection of REST services to user in platform validation.
 
 * Request 
 * Resources 
+* Load
 
 ### /v1/request
 
@@ -105,5 +106,28 @@ Collection of REST services to user in platform validation.
       "context": "source: /sys/fs/cgroup/cpu/cpu.cfs_quota_us, writable: false"
     }
   }
+}
+```
+
+### /v1/load
+
+> Note, uses all available cores at 100%. Use load duration parameter: `/v1/load?duration=5s` to specify the duration of the load generation across all cores. 
+
+```json
+{
+ "request": {
+  "id": "3684ab34-aed8-11eb-ba54-1e00d11edc71",
+  "time": "2021-05-06T19:02:01.57696-07:00",
+  "uri": "/v1/load?duration=5s",
+  "host": "app.domain.com",
+  "method": "GET"
+ },
+ "result": {
+  "cores": 8,
+  "start": 1620352921,
+  "end": 1620352926,
+  "operations": 8454324,
+  "duration": "5s"
+ }
 }
 ```
