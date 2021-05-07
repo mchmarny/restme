@@ -5,7 +5,7 @@ Collection of REST services to user in platform validation.
 ## services 
 
 * [Request](#v1resource)
-* [Resources](#v1resources)
+* [Resources](#v1resource)
 * [Load](#v1load)
 
 ### /v1/request
