@@ -2,21 +2,10 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/mchmarny/restme/pkg/kube"
 )
-
-func NewResourceHandler(logger *log.Logger) ResourceHandler {
-	return ResourceHandler{
-		logger: logger,
-	}
-}
-
-type ResourceHandler struct {
-	logger *log.Logger
-}
 
 // Resource represents simple Kube resource
 type Resource struct {
@@ -26,9 +15,7 @@ type Resource struct {
 	Limits    *kube.ResourceInfo `json:"limits,omitempty"`
 }
 
-func (h ResourceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.logger.Printf("serving: %+v", r)
-
+func ResourceHandler(w http.ResponseWriter, r *http.Request) {
 	result := &Resource{
 		Request:   getRequestMetadata(r),
 		Host:      kube.GetHostInfo(),

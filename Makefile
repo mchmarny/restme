@@ -28,7 +28,7 @@ run: ## Runs uncompiled Go code
 message: ## Invokes echo service 
 	curl -i -H "Content-Type: application/json" \
 		http://localhost:8080/v1/echo \
-		-d '{ "on": 1620253683, "msg": "hellow" }'
+		-d '{ "on": $(shell date +%s), "msg": "hello?" }'
 .PHONY: message
 
 upgrade: ## Upgrades all dependancies 

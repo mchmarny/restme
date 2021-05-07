@@ -31,16 +31,6 @@ func (h EchoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch r.Method {
-	case http.MethodPost:
-		h.handlePost(w, r)
-	default:
-		handleError(w, http.StatusMethodNotAllowed, "Supported methods: POST")
-		return
-	}
-}
-
-func (h EchoHandler) handlePost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		handleError(w, http.StatusUnsupportedMediaType, "Invalid method, expected %s", http.MethodPost)
 		return

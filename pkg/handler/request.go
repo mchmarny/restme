@@ -28,19 +28,7 @@ type RequestMetadata struct {
 	Method string    `json:"method"`
 }
 
-func NewRequestHandler(logger *log.Logger) RequestHandler {
-	return RequestHandler{
-		logger: logger,
-	}
-}
-
-type RequestHandler struct {
-	logger *log.Logger
-}
-
-func (h RequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.logger.Printf("serving: %+v", r)
-
+func RequestHandler(w http.ResponseWriter, r *http.Request) {
 	result := &Request{
 		Request: getRequestMetadata(r),
 		Headers: make(map[string]interface{}),

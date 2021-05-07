@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	shutdownWaitSeconds = 5
+	shutdownWaitSeconds  = 5
+	serverTimeoutSeconds = 600
 )
 
 var (
@@ -25,25 +26,22 @@ var (
 func main() {
 	mux := http.NewServeMux()
 
-	// default
 	mux.HandleFunc("/", handler.DefaultHandler)
+	mux.HandleFunc("/v1/load", handler.LoadHandler)
+	mux.HandleFunc("/v1/resource", handler.ResourceHandler)
+	mux.HandleFunc("/v1/request", handler.RequestHandler)
 
 	// echo
 	echoHandler := handler.NewEchoHandler(logger)
 	mux.Handle("/v1/echo", echoHandler)
 
-	// resource
-	resourceHandler := handler.NewResourceHandler(logger)
-	mux.Handle("/v1/resource", resourceHandler)
-
-	// request
-	requestHandler := handler.NewRequestHandler(logger)
-	mux.Handle("/v1/request", requestHandler)
-
 	s := &http.Server{
-		Addr:     address,
-		Handler:  mux,
-		ErrorLog: logger,
+		Addr:         address,
+		Handler:      mux,
+		ErrorLog:     logger,
+		ReadTimeout:  time.Second * serverTimeoutSeconds,
+		WriteTimeout: time.Second * serverTimeoutSeconds,
+		IdleTimeout:  time.Second * serverTimeoutSeconds,
 	}
 
 	done := make(chan os.Signal, 1)
