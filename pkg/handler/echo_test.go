@@ -13,7 +13,7 @@ import (
 )
 
 func TestEchoHandler(t *testing.T) {
-	router := SetupRouter(log.New("EchoHandler", true))
+	router := SetupRouter(log.New("TestEchoHandler"))
 
 	m := message{
 		On:      time.Now().Unix(),

@@ -10,7 +10,7 @@ import (
 )
 
 func TestRequestHandler(t *testing.T) {
-	router := SetupRouter(log.New("RequestHandler", true))
+	router := SetupRouter(log.New("TestRequestHandler"))
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/v1/request", nil)

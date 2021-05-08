@@ -6,23 +6,37 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	LogLevelEnvVar = "LOG_LEVEL"
+)
+
 // New is a project global creator of logger
-func New(app string, verbose bool) *Logger {
+func New(name string) *Logger {
 	l := logrus.New()
 	l.SetOutput(os.Stdout)
 	l.SetFormatter(&logrus.TextFormatter{
 		DisableTimestamp: true,
 	})
 
-	if verbose {
-		l.SetLevel(logrus.DebugLevel)
-	} else {
+	lev, ok := os.LookupEnv(LogLevelEnvVar)
+	if !ok {
+		l.Infof("%s not set, using default: %s", LogLevelEnvVar, logrus.InfoLevel)
+		lev = logrus.InfoLevel.String()
+	}
+
+	v, err := logrus.ParseLevel(os.Getenv(LogLevelEnvVar))
+	if err != nil {
+		l.Errorf("invalid debug level format: %s", lev)
 		l.SetLevel(logrus.InfoLevel)
+	}
+	l.SetLevel(v)
+	if !l.IsLevelEnabled(v) {
+		l.Errorf("log level not enabled, expected: %s, got: %s", lev, l.GetLevel())
 	}
 
 	return &Logger{
 		logger: l.WithFields(logrus.Fields{
-			"app": app,
+			"for": name,
 		}),
 	}
 }
@@ -30,6 +44,11 @@ func New(app string, verbose bool) *Logger {
 // Logger is the internal logrus abstraction
 type Logger struct {
 	logger *logrus.Entry
+}
+
+// GetLevel returns the logger configured level.
+func (l *Logger) GetLevel() logrus.Level {
+	return l.logger.Logger.GetLevel()
 }
 
 // Info logs a message at level Info.

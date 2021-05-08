@@ -23,11 +23,10 @@ const (
 
 var (
 	address = config.GetEnv("ADDRESS", ":8080")
-	verbose = config.GetEnv("DEBUG", "")
 )
 
 func main() {
-	logger := log.New(appName, verbose != "")
+	logger := log.New(appName)
 
 	s := &http.Server{
 		Addr:           address,

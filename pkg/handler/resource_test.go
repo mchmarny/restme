@@ -10,7 +10,7 @@ import (
 )
 
 func TestResourceHandler(t *testing.T) {
-	router := SetupRouter(log.New("ResourceHandler", true))
+	router := SetupRouter(log.New("TestResourceHandler"))
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/v1/resource", nil)

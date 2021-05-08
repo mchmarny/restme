@@ -4,23 +4,23 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mchmarny/restme/pkg/kube"
+	"github.com/mchmarny/restme/pkg/runtime"
 )
 
 // Resource represents simple Kube resource
 type Resource struct {
-	Request   *RequestMetadata   `json:"request,omitempty"`
-	Host      *kube.HostInfo     `json:"host,omitempty"`
-	Resources *kube.ResourceInfo `json:"resources,omitempty"`
-	Limits    *kube.ResourceInfo `json:"limits,omitempty"`
+	Request   *RequestMetadata      `json:"request,omitempty"`
+	Host      *runtime.HostInfo     `json:"host,omitempty"`
+	Resources *runtime.ResourceInfo `json:"resources,omitempty"`
+	Limits    *runtime.ResourceInfo `json:"limits,omitempty"`
 }
 
 func ResourceHandler(c *gin.Context) {
 	result := &Resource{
 		Request:   getRequestMetadata(c),
-		Host:      kube.GetHostInfo(),
-		Resources: kube.GetResourceInfo(),
-		Limits:    kube.GetLimits(),
+		Host:      runtime.GetHostInfo(),
+		Resources: runtime.GetResourceInfo(),
+		Limits:    runtime.GetLimits(),
 	}
 
 	c.IndentedJSON(http.StatusOK, result)
