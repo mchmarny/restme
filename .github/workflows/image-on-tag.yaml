@@ -72,11 +72,7 @@ jobs:
         kubectl rollout status deployment/rester
         kubectl get pods
         kubectl get services
-
-    - name: Query
-      run: |
-        kubectl run -i --rm --image=python:3 --command -- sh -c \
-          'curl -i -H "Content-Type: application/json" http://${{ env.NODE_IP }}:30080/v1/request'
+        kubectl logs -l app=rester
 
 
         
