@@ -75,6 +75,6 @@ jobs:
 
     - name: Query
       run: |
-        kubectl port-forward service/rester 8080:8080 &
+        kubectl port-forward --address 0.0.0.0 service/rester 8080:8080 &
         curl -i -H "Content-Type: application/json" \
           http://localhost:8080/v1/request
