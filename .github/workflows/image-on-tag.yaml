@@ -56,5 +56,5 @@ jobs:
         kubectl get pods -n kube-system
         echo "current-context:" $(kubectl config current-context)
         for pod in $(kubectl get pods --no-headers -n kube-system -o custom-columns=":metadata.name"); do \
-          kubectl wait --for=condition=complete pod/$pod --timeout=60s -n kube-system; done
+          kubectl wait --for=condition=complete pod/$pod --timeout=180s -n kube-system; done
         
