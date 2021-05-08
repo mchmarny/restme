@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"encoding/json"
-	"errors"
-	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/mchmarny/restme/pkg/log"
 )
 
 func NewEchoHandler(logger *log.Logger) EchoHandler {
@@ -22,44 +22,14 @@ type message struct {
 	Message string `json:"msg"`
 }
 
-func (h EchoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.logger.Printf("serving: %+v", r)
-
-	contentType := r.Header.Get("Content-Type")
-	if contentType != contentTypeJSON {
-		handleError(w, http.StatusUnsupportedMediaType, "Invalid content type, expected %s", contentTypeJSON)
-		return
-	}
-
-	if r.Method != http.MethodPost {
-		handleError(w, http.StatusUnsupportedMediaType, "Invalid method, expected %s", http.MethodPost)
-		return
-	}
-
+func (h EchoHandler) EchoHandler(c *gin.Context) {
 	var m message
-	var unmarshalErr *json.UnmarshalTypeError
-
-	decoder := json.NewDecoder(r.Body)
-	decoder.DisallowUnknownFields()
-
-	if err := decoder.Decode(&m); err != nil {
-		if errors.As(err, &unmarshalErr) {
-			handleError(w, http.StatusBadRequest, "Wrong type for field: %s", unmarshalErr.Field)
-		} else {
-			handleError(w, http.StatusBadRequest, "Invalid message: %v", err)
-		}
+	if err := c.ShouldBindJSON(&m); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	h.logger.Printf("message: %v", m)
+	h.logger.Debugf("message: %v", m)
 
-	encoder := json.NewEncoder(w)
-	encoder.SetIndent("", " ")
-
-	if err := encoder.Encode(m); err != nil {
-		handleError(w, http.StatusInternalServerError, "Error encoding message: %v", err)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
+	c.IndentedJSON(http.StatusOK, m)
 }

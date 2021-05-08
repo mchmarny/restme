@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
@@ -28,9 +28,9 @@ type RequestMetadata struct {
 	Method string    `json:"method"`
 }
 
-func RequestHandler(w http.ResponseWriter, r *http.Request) {
+func RequestHandler(c *gin.Context) {
 	result := &Request{
-		Request: getRequestMetadata(r),
+		Request: getRequestMetadata(c),
 		Headers: make(map[string]interface{}),
 		EnvVars: make(map[string]interface{}),
 	}
@@ -42,7 +42,7 @@ func RequestHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// headers
-	for name, headers := range r.Header {
+	for name, headers := range c.Request.Header {
 		name = strings.ToLower(name)
 		for i, h := range headers {
 			if len(headers) > 1 {
@@ -53,16 +53,10 @@ func RequestHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	encoder := json.NewEncoder(w)
-	encoder.SetIndent("", " ")
-
-	if err := encoder.Encode(result); err != nil {
-		handleError(w, http.StatusInternalServerError, "Error processing request: %v", err)
-		return
-	}
+	c.IndentedJSON(http.StatusOK, result)
 }
 
-func getRequestMetadata(r *http.Request) *RequestMetadata {
+func getRequestMetadata(c *gin.Context) *RequestMetadata {
 	id, err := uuid.NewUUID()
 	if err != nil {
 		log.Fatalf("Error while getting id: %v\n", err)
@@ -71,8 +65,8 @@ func getRequestMetadata(r *http.Request) *RequestMetadata {
 	return &RequestMetadata{
 		ID:     id.String(),
 		On:     time.Now(),
-		URI:    r.RequestURI,
-		Host:   r.Host,
-		Method: r.Method,
+		URI:    c.Request.Proto,
+		Host:   c.Request.Host,
+		Method: c.Request.Method,
 	}
 }

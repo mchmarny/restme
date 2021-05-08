@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,37 +10,31 @@ import (
 
 	"github.com/mchmarny/restme/pkg/config"
 	"github.com/mchmarny/restme/pkg/handler"
+	"github.com/mchmarny/restme/pkg/log"
 )
 
 const (
-	shutdownWaitSeconds  = 5
-	serverTimeoutSeconds = 600
+	appName = "rester"
+
+	serverShutdownWaitSeconds = 5
+	serverTimeoutSeconds      = 300
+	serverMaxHeaderBytes      = 20
 )
 
 var (
-	logger  = log.New(os.Stdout, "", 0)
 	address = config.GetEnv("ADDRESS", ":8080")
+	verbose = config.GetEnv("DEBUG", "")
 )
 
 func main() {
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/", handler.DefaultHandler)
-	mux.HandleFunc("/v1/load", handler.LoadHandler)
-	mux.HandleFunc("/v1/resource", handler.ResourceHandler)
-	mux.HandleFunc("/v1/request", handler.RequestHandler)
-
-	// echo
-	echoHandler := handler.NewEchoHandler(logger)
-	mux.Handle("/v1/echo", echoHandler)
+	logger := log.New(appName, verbose != "")
 
 	s := &http.Server{
-		Addr:         address,
-		Handler:      mux,
-		ErrorLog:     logger,
-		ReadTimeout:  time.Second * serverTimeoutSeconds,
-		WriteTimeout: time.Second * serverTimeoutSeconds,
-		IdleTimeout:  time.Second * serverTimeoutSeconds,
+		Addr:           address,
+		Handler:        handler.SetupRouter(logger),
+		ReadTimeout:    serverTimeoutSeconds * time.Second,
+		WriteTimeout:   serverTimeoutSeconds * time.Second,
+		MaxHeaderBytes: 1 << serverMaxHeaderBytes,
 	}
 
 	done := make(chan os.Signal, 1)
@@ -49,15 +42,15 @@ func main() {
 
 	go func() {
 		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Fatalf("listen: %s\n", err)
+			logger.Fatalf("error: %s\n", err)
 		}
 	}()
-	logger.Println("server started")
+	logger.Info("server started")
 
 	<-done
-	logger.Println("server stopped")
+	logger.Info("server stopped")
 
-	ctx, cancel := context.WithTimeout(context.Background(), shutdownWaitSeconds*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), serverShutdownWaitSeconds*time.Second)
 	defer cancel()
 
 	if err := s.Shutdown(ctx); err != nil {

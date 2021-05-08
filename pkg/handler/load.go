@@ -1,37 +1,31 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/mchmarny/restme/pkg/load"
 )
 
-// Load represents simple HTTP load rresult
+// Load represents simple HTTP load result
 type LoadResult struct {
 	Request *RequestMetadata    `json:"request,omitempty"`
 	Result  *load.CPULoadResult `json:"result,omitempty"`
 }
 
-func LoadHandler(w http.ResponseWriter, r *http.Request) {
-	durStr := r.URL.Query().Get("duration")
+func LoadHandler(c *gin.Context) {
+	durStr := c.Param("duration")
 	duration, err := time.ParseDuration(durStr)
 	if err != nil {
-		handleError(w, http.StatusBadRequest, "Invalid duration parameter: '%s'", durStr)
+		c.JSON(http.StatusBadRequest, gin.H{"Invalid duration parameter": durStr})
 		return
 	}
 
 	result := &LoadResult{
-		Request: getRequestMetadata(r),
+		Request: getRequestMetadata(c),
 		Result:  load.MakeCPULoad(duration),
 	}
 
-	encoder := json.NewEncoder(w)
-	encoder.SetIndent("", " ")
-
-	if err := encoder.Encode(result); err != nil {
-		handleError(w, http.StatusInternalServerError, "Error processing request: %v", err)
-		return
-	}
+	c.IndentedJSON(http.StatusOK, result)
 }

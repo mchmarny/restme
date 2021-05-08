@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/mchmarny/restme/pkg/kube"
 )
 
@@ -15,19 +15,13 @@ type Resource struct {
 	Limits    *kube.ResourceInfo `json:"limits,omitempty"`
 }
 
-func ResourceHandler(w http.ResponseWriter, r *http.Request) {
+func ResourceHandler(c *gin.Context) {
 	result := &Resource{
-		Request:   getRequestMetadata(r),
+		Request:   getRequestMetadata(c),
 		Host:      kube.GetHostInfo(),
 		Resources: kube.GetResourceInfo(),
 		Limits:    kube.GetLimits(),
 	}
 
-	encoder := json.NewEncoder(w)
-	encoder.SetIndent("", " ")
-
-	if err := encoder.Encode(result); err != nil {
-		handleError(w, http.StatusInternalServerError, "Error processing request: %v", err)
-		return
-	}
+	c.IndentedJSON(http.StatusOK, result)
 }
