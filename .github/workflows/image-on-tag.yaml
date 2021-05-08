@@ -51,7 +51,7 @@ jobs:
       with:
         version: v0.10.0
         wait: "600s"
-        # config: configs/ci-cluster.yaml
+        config: configs/ci-cluster.yaml
 
     - name: Verify
       run: |
@@ -75,6 +75,8 @@ jobs:
 
     - name: Query
       run: |
-        kubectl port-forward --address 0.0.0.0 service/rester 8080:8080 &
-        curl -i -H "Content-Type: application/json" \
-          http://localhost:8080/v1/request
+        kubectl run -i --rm --image=python:3 --command -- sh -c \
+          'curl -i -H "Content-Type: application/json" http://${{ env.NODE_IP }}:30080/v1/request'
+
+
+        
