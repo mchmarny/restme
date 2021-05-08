@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: rester
-        image: ghcr.io/mchmarny/rester:v0.1.4
+        image: IMAGE_URI
         ports:
         - containerPort: 8080
         env:

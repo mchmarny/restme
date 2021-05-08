@@ -58,8 +58,16 @@ jobs:
         kubectl cluster-info
         echo "current-context:" $(kubectl config current-context)
         kubectl get pods -n kube-system
-        sleep 30
-        kubectl get pods -n kube-system
+        sleep 5
         for pod in $(kubectl get pods --no-headers -n kube-system -o custom-columns=":metadata.name"); do \
-          kubectl wait --for=condition=ready pod/$pod --timeout=180s -n kube-system; done
-        
+          kubectl wait --for=condition=ready pod/$pod --timeout=300s -n kube-system; done
+
+    - name: Deploy
+      run: |
+        echo "current-context:" $(kubectl config current-context)
+        sed "s/IMAGE_URI/ghcr.io/$GITHUB_REPOSITORY:${{ env.RELEASE_VERSION }}/g" \
+          deployments/ci-template.yaml > deployments/ci-test.yaml
+        cat deployments/ci-test.yaml
+        kubectl apply -f deployments/ci-test.yaml
+        kubectl rollout status deployment/rester
+        kubectl get pods
