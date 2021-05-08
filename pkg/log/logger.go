@@ -8,15 +8,23 @@ import (
 
 const (
 	LogLevelEnvVar = "LOG_LEVEL"
+	LogJSONEnvVar  = "LOG_JSON"
 )
 
 // New is a project global creator of logger
 func New(name string) *Logger {
 	l := logrus.New()
 	l.SetOutput(os.Stdout)
-	l.SetFormatter(&logrus.TextFormatter{
-		DisableTimestamp: true,
-	})
+	l.SetReportCaller(true)
+
+	if os.Getenv(LogJSONEnvVar) != "" {
+		l.SetFormatter(&logrus.JSONFormatter{})
+	} else {
+		l.SetFormatter(&logrus.TextFormatter{
+			DisableTimestamp: true,
+			ForceColors:      true,
+		})
+	}
 
 	lev, ok := os.LookupEnv(LogLevelEnvVar)
 	if !ok {
@@ -24,7 +32,7 @@ func New(name string) *Logger {
 		lev = logrus.InfoLevel.String()
 	}
 
-	v, err := logrus.ParseLevel(os.Getenv(LogLevelEnvVar))
+	v, err := logrus.ParseLevel(lev)
 	if err != nil {
 		l.Errorf("invalid debug level format: %s", lev)
 		l.SetLevel(logrus.InfoLevel)
@@ -35,14 +43,16 @@ func New(name string) *Logger {
 	}
 
 	return &Logger{
+		name: name,
 		logger: l.WithFields(logrus.Fields{
-			"for": name,
+			"app": name,
 		}),
 	}
 }
 
 // Logger is the internal logrus abstraction
 type Logger struct {
+	name   string
 	logger *logrus.Entry
 }
 

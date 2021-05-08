@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.2.1
+RELEASE_VERSION  ?=v0.2.2
 KO_DOCKER_REPO   ?=ghcr.io/mchmarny
 
 all: help
@@ -22,7 +22,7 @@ lint: ## Lints the entire project
 .PHONY: lint
 
 run: ## Runs uncompiled Go code
-	go run ./cmd/main.go
+	LOG_LEVEL=debug go run ./cmd/main.go
 .PHONY: run
 
 message: ## Invokes echo service 
@@ -30,6 +30,11 @@ message: ## Invokes echo service
 		http://localhost:8080/v1/echo \
 		-d '{ "on": $(shell date +%s), "msg": "hello?" }'
 .PHONY: message
+
+build: ## Compiles the code.
+	CGO_ENABLED=0 go build -a -mod vendor -o bin/rester ./cmd/
+	GIN_MODE=release LOG_JSON=true bin/rester
+.PHONY: build
 
 upgrade: ## Upgrades all dependancies 
 	go get -u ./...

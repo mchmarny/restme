@@ -16,7 +16,7 @@ func TestHost(t *testing.T) {
 	t.Run("test runtime level", func(t *testing.T) {
 		os.Unsetenv(LogLevelEnvVar)
 		logger := New("test")
-		assert.Equal(t, logrus.PanicLevel.String(), logger.GetLevel().String())
+		assert.Equal(t, logrus.InfoLevel.String(), logger.GetLevel().String())
 	})
 	t.Run("test debug level", func(t *testing.T) {
 		os.Setenv(LogLevelEnvVar, "debug")

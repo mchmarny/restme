@@ -9,15 +9,25 @@ import (
 
 func DefaultHandler(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{
-		c.FullPath(): "not implemented",
+		"path":   c.FullPath(),
+		"status": "not implemented",
+		"available": []string{
+			"/echo",
+			"/load/:duration",
+			"/request",
+			"/resource",
+		},
 	})
 }
 
 func SetupRouter(logger *log.Logger) *gin.Engine {
 	gin.ForceConsoleColor()
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Recovery())
+	r.Use(gin.Logger())
+	r.Use(Options)
 
-	r.Any("/", DefaultHandler)
+	r.GET("/", DefaultHandler)
 
 	v1 := r.Group("/v1")
 	{
@@ -29,4 +39,18 @@ func SetupRouter(logger *log.Logger) *gin.Engine {
 		v1.GET("/request", RequestHandler)
 	}
 	return r
+}
+
+// Options midleware adds options headers.
+func Options(c *gin.Context) {
+	if c.Request.Method != "OPTIONS" {
+		c.Next()
+	} else {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "POST,OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "authorization, origin, content-type, accept")
+		c.Header("Allow", "POST,OPTIONS")
+		c.Header("Content-Type", "application/json")
+		c.AbortWithStatus(http.StatusOK)
+	}
 }
