@@ -72,8 +72,10 @@ jobs:
         kubectl rollout status deployment/rester
         kubectl get pods
         kubectl get services
+        echo "SERVICE_IP=$(kubectl get service/rester -o jsonpath='{.spec.clusterIP}')" >> $GITHUB_ENV
 
     - name: Query
       run: |
+        echo "Service IP: ${{ env.SERVICE_IP }}"
         curl -i -H "Content-Type: application/json" \
-          http://127.0.0.1:30007/v1/request
+          http://${{ env.SERVICE_IP }}/v1/request
