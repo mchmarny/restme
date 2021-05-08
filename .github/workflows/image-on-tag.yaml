@@ -53,12 +53,9 @@ jobs:
     - name: Verify
       run: |
         kubectl cluster-info
-        kubectl get deployments -n kube-system
+        kubectl get pods -n kube-system
         echo "current-context:" $(kubectl config current-context)
         kubectl rollout status deployment/coredns -n kube-system
-        kubectl rollout status deployment/etcd-kind-control-plane -n kube-system
-        kubectl rollout status deployment/kindnet -n kube-system
-        kubectl rollout status deployment/kube-apiserver-kind-control-plane -n kube-system
-        kubectl rollout status deployment/kube-controller-manager-kind-control-plane -n kube-system
-        kubectl rollout status deployment/kube-proxy -n kube-system
-        kubectl rollout status deployment/kube-scheduler-kind-control-plane -n kube-system
+        for pod in $(kubectl get pods --no-headers -o custom-columns=":metadata.name"); do \
+          kubectl wait --for=condition=complete pod/$pod --timeout=60s; done
+        
