@@ -72,10 +72,9 @@ jobs:
         kubectl rollout status deployment/rester
         kubectl get pods
         kubectl get services
-        echo "SERVICE_IP=$(kubectl get service/rester -o jsonpath='{.spec.clusterIP}')" >> $GITHUB_ENV
 
     - name: Query
       run: |
-        echo "Service IP: ${{ env.SERVICE_IP }}"
+        kubectl port-forward svc/rester 8080:80 &
         curl -i -H "Content-Type: application/json" \
-          http://${{ env.SERVICE_IP }}/v1/request
+          http://127.0.0.1:8080/v1/request
