@@ -22,6 +22,7 @@ const (
 )
 
 var (
+	version = "v0.0.1-default"
 	address = config.GetEnv("ADDRESS", ":8080")
 )
 
@@ -30,7 +31,7 @@ func main() {
 
 	s := &http.Server{
 		Addr:           address,
-		Handler:        handler.SetupRouter(logger),
+		Handler:        handler.SetupRouter(appName, version, logger),
 		ReadTimeout:    serverTimeoutSeconds * time.Second,
 		WriteTimeout:   serverTimeoutSeconds * time.Second,
 		MaxHeaderBytes: 1 << serverMaxHeaderBytes,

@@ -5,12 +5,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/mchmarny/restme/pkg/log"
 	"github.com/stretchr/testify/assert"
 )
 
+func getTestRouter() *gin.Engine {
+	return SetupRouter("test", "v0.0.1-test", log.New("test"))
+}
+
 func TestDefaultHandler(t *testing.T) {
-	router := SetupRouter(log.New("TestDefaultHandler"))
+	router := getTestRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/", nil)

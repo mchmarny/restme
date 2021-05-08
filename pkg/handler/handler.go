@@ -19,7 +19,7 @@ func DefaultHandler(c *gin.Context) {
 	})
 }
 
-func SetupRouter(logger *log.Logger) *gin.Engine {
+func SetupRouter(name, version string, logger *log.Logger) *gin.Engine {
 	gin.ForceConsoleColor()
 	r := gin.New()
 	r.Use(gin.Recovery())

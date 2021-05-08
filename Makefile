@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.2.9
+RELEASE_VERSION  ?=v0.2.11
 KO_DOCKER_REPO   ?=ghcr.io/mchmarny
 
 all: help
@@ -42,7 +42,9 @@ upgrade: ## Upgrades all dependancies
 .PHONY: upgrade
 
 image: ## Creates container image using ko
-	KO_DOCKER_REPO=$(KO_DOCKER_REPO)/$(SERVICE_NAME) ko publish ./cmd/ --bare --tags $(RELEASE_VERSION),latest
+	KO_DOCKER_REPO=$(KO_DOCKER_REPO)/$(SERVICE_NAME) \
+	GOFLAGS="-ldflags=-X=main.version=$(RELEASE_VERSION)" \
+		ko publish ./cmd/ --bare --tags $(RELEASE_VERSION),latest
 .PHONY: tag
 
 tag: ## Creates release tag 

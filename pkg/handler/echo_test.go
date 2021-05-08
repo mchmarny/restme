@@ -8,12 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mchmarny/restme/pkg/log"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestEchoHandler(t *testing.T) {
-	router := SetupRouter(log.New("TestEchoHandler"))
+	router := getTestRouter()
 
 	m := message{
 		On:      time.Now().Unix(),

@@ -43,18 +43,23 @@ jobs:
     - name: Publish 
       run: |
         KO_DOCKER_REPO=ghcr.io/$GITHUB_REPOSITORY \
+        GOFLAGS="-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}" \
           ko publish ./cmd/ --bare --tags ${{ env.RELEASE_VERSION }},latest
 
     - name: Cluster
       uses: engineerd/setup-kind@v0.5.0
       with:
-        version: "v0.9.0"
+        version: v0.10.0
+        wait: "600s"
+        config: configs/ci-cluster.yaml
 
     - name: Verify
       run: |
         kubectl cluster-info
-        kubectl get pods -n kube-system
         echo "current-context:" $(kubectl config current-context)
+        kubectl get pods -n kube-system
+        sleep 30
+        kubectl get pods -n kube-system
         for pod in $(kubectl get pods --no-headers -n kube-system -o custom-columns=":metadata.name"); do \
-          kubectl wait --for=condition=complete pod/$pod --timeout=180s -n kube-system; done
+          kubectl wait --for=condition=ready pod/$pod --timeout=180s -n kube-system; done
         

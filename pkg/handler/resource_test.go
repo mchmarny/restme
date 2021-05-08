@@ -5,12 +5,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/mchmarny/restme/pkg/log"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestResourceHandler(t *testing.T) {
-	router := SetupRouter(log.New("TestResourceHandler"))
+	router := getTestRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/v1/resource", nil)
