@@ -50,9 +50,15 @@ jobs:
       with:
         version: "v0.9.0"
 
-    - name: Deploy
+    - name: Verify
       run: |
         kubectl cluster-info
-        kubectl get pods -n kube-system
+        kubectl get deployments -n kube-system
         echo "current-context:" $(kubectl config current-context)
-        echo "environment-kubeconfig:" ${KUBECONFIG}
+        kubectl rollout status deployment/coredns -n kube-system
+        kubectl rollout status deployment/etcd-kind-control-plane -n kube-system
+        kubectl rollout status deployment/kindnet -n kube-system
+        kubectl rollout status deployment/kube-apiserver-kind-control-plane -n kube-system
+        kubectl rollout status deployment/kube-controller-manager-kind-control-plane -n kube-system
+        kubectl rollout status deployment/kube-proxy -n kube-system
+        kubectl rollout status deployment/kube-scheduler-kind-control-plane -n kube-system
