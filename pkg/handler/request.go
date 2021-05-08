@@ -21,11 +21,12 @@ type Request struct {
 
 // RequestMetadata represents metadata of the request
 type RequestMetadata struct {
-	ID     string    `json:"id"`
-	On     time.Time `json:"time"`
-	URI    string    `json:"uri"`
-	Host   string    `json:"host"`
-	Method string    `json:"method"`
+	ID       string    `json:"id"`
+	On       time.Time `json:"time"`
+	Path     string    `json:"path"`
+	Protocol string    `json:"protocol"`
+	Host     string    `json:"host"`
+	Method   string    `json:"method"`
 }
 
 func RequestHandler(c *gin.Context) {
@@ -63,10 +64,11 @@ func getRequestMetadata(c *gin.Context) *RequestMetadata {
 	}
 
 	return &RequestMetadata{
-		ID:     id.String(),
-		On:     time.Now(),
-		URI:    c.Request.Proto,
-		Host:   c.Request.Host,
-		Method: c.Request.Method,
+		ID:       id.String(),
+		On:       time.Now().UTC(),
+		Path:     c.FullPath(),
+		Protocol: c.Request.Proto,
+		Host:     c.Request.Host,
+		Method:   c.Request.Method,
 	}
 }

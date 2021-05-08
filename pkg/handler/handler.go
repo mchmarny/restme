@@ -9,13 +9,12 @@ import (
 
 func DefaultHandler(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"path":   c.FullPath(),
-		"status": "not implemented",
-		"available": []string{
-			"/echo",
-			"/load/:duration",
-			"/request",
-			"/resource",
+		"request": getRequestMetadata(c),
+		"routes": []string{
+			"POST /v1/echo",
+			"GET /v1/load/:duration (e.g. 5s)",
+			"GET /v1/request",
+			"GET /v1/resource",
 		},
 	})
 }
