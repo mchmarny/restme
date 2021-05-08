@@ -53,7 +53,7 @@ jobs:
         wait: "600s"
         config: configs/ci-cluster.yaml
 
-    - name: Verify
+    - name: Status
       run: |
         kubectl cluster-info
         echo "current-context:" $(kubectl config current-context)
@@ -69,9 +69,12 @@ jobs:
           deployments/ci-template.yaml > deployments/ci-test.yaml
         cat deployments/ci-test.yaml
         kubectl apply -f deployments/ci-test.yaml
+
+    - name: Verify
+      run: | 
         kubectl rollout status deployment/rester
-        kubectl get pods
-        kubectl get services
+        kubectl get pods -l app=rester
+        kubectl get services -l app=rester
         kubectl logs -l app=rester
 
 
