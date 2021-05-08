@@ -73,8 +73,15 @@ jobs:
         kubectl get pods
         kubectl get services
 
+    - name: IP
+      run: |
+        echo "current-context:" $(kubectl config current-context)
+        NODE_IP=$(kubectl get nodes \
+          -l kubernetes.io/hostname!=kind-control-plane \
+          -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}')
+        echo "NODE_IP=$NODE_IP" >> $GITHUB_ENV
+
     - name: Query
       run: |
-        kubectl port-forward svc/rester 8080:80 &
         curl -i -H "Content-Type: application/json" \
-          http://127.0.0.1:8080/v1/request
+          http://${{ env.NODE_IP }}:8080/v1/request
