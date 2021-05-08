@@ -37,8 +37,22 @@ jobs:
       run: |
         echo "RELEASE_VERSION=$(make version)" >> $GITHUB_ENV
         
-    - uses: imjasonh/setup-ko@v0.4
+    - name: Ko
+      uses: imjasonh/setup-ko@v0.4
+
     - name: Publish 
       run: |
         KO_DOCKER_REPO=ghcr.io/$GITHUB_REPOSITORY \
           ko publish ./cmd/ --bare --tags ${{ env.RELEASE_VERSION }},latest
+
+    - name: Cluster
+      uses: engineerd/setup-kind@v0.5.0
+      with:
+        version: "v0.9.0"
+
+    - name: Deploy
+      run: |
+        kubectl cluster-info
+        kubectl get pods -n kube-system
+        echo "current-context:" $(kubectl config current-context)
+        echo "environment-kubeconfig:" ${KUBECONFIG}
