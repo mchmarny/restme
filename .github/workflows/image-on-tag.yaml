@@ -71,3 +71,9 @@ jobs:
         kubectl apply -f deployments/ci-test.yaml
         kubectl rollout status deployment/rester
         kubectl get pods
+        kubectl get services
+
+    - name: Query
+      run: |
+        curl -i -H "Content-Type: application/json" \
+          http://127.0.0.1:30007/v1/request
