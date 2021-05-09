@@ -40,6 +40,12 @@ jobs:
     - name: Ko
       uses: imjasonh/setup-ko@v0.4
 
+    - name: jq
+      run: |
+        wget http://stedolan.github.io/jq/download/linux64/jq
+        chmod +x ./jq
+        sudo cp jq /usr/bin
+
     - name: Publish 
       run: |
         KO_DOCKER_REPO=ghcr.io/$GITHUB_REPOSITORY \
@@ -92,3 +98,11 @@ jobs:
 
         curl -i -H "Content-Type: application/json" \
           http://${NODE_IP[0]}:30080/v1/load/5s
+
+        VERSION=$(curl -H "Content-Type: application/json" \
+          http://localhost:8080/v1/request | jq ".request.version")
+        
+        if [ "$VERSION" != "${{ env.RELEASE_VERSION }}" ]; then
+          echo "invalid version, expected: ${{ env.RELEASE_VERSION }}, got: ${VERSION}"
+          exit 0;
+        fi
