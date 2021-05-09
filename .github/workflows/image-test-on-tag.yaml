@@ -89,3 +89,9 @@ jobs:
         
         curl -i -H "Content-Type: application/json" \
           http://${NODE_IP[0]}:30080/v1/request
+
+        curl -i -H "Content-Type: application/json" \
+          http://${NODE_IP[0]}:30080/v1/resource
+
+        curl -i -H "Content-Type: application/json" \
+          http://${NODE_IP[0]}:30080/v1/load/5s
