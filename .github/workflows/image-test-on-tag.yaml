@@ -79,11 +79,14 @@ jobs:
 
     - name: Invoke
       run: | 
-        kubectl exec -it ghcr.io/mchmarny/test-image:v0.3.1 -- curl \
-          curl -i -H "Content-Type: application/json" \
-          http://restme.default.svc.cluster.local/v1/request
+        set -x
 
-
+        # control-plane node doesn't expose the nodeport service
+        NODE_ID=( $(kubectl get nodes -l kubernetes.io/hostname!=kind-control-plane -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}') )
         
+        echo "current-context: ${NODE_ID}"
+        
+        curl -i -H "Content-Type: application/json" \
+          http://${NODE_ID}:30080/v1/request
 
         
