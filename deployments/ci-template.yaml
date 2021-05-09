@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: restme
-        image: IMAGE_URI
+        image: ko://github.com/mchmarny/restme/cmd
         ports:
         - containerPort: 8080
         env:

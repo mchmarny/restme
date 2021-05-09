@@ -9,6 +9,10 @@ jobs:
 
   e2e-test:
     runs-on: ubuntu-latest
+    env:
+      # GOPATH: ${{ github.workspace }}
+      GO111MODULE: "on"
+      KO_DOCKER_REPO: kind.local
     steps:
 
     - name: Setup
@@ -37,20 +41,13 @@ jobs:
       run: |
         echo "RELEASE_VERSION=$(make version)" >> $GITHUB_ENV
         
-    - name: Ko
-      uses: imjasonh/setup-ko@v0.4
-
-    - name: jq
+    - name: Dependency
       run: |
+        GO111MODULE=on go get github.com/google/ko/cmd/ko@master
+
         wget http://stedolan.github.io/jq/download/linux64/jq
         chmod +x ./jq
         sudo cp jq /usr/bin
-
-    - name: Publish 
-      run: |
-        KO_DOCKER_REPO=ghcr.io/$GITHUB_REPOSITORY \
-        GOFLAGS="-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}" \
-          ko publish ./cmd/ --bare --tags ${{ env.RELEASE_VERSION }},latest
 
     - name: Cluster
       uses: engineerd/setup-kind@v0.5.0
@@ -71,10 +68,8 @@ jobs:
     - name: Deploy
       run: |
         echo "current-context:" $(kubectl config current-context)
-        sed "s|IMAGE_URI|ghcr.io/$GITHUB_REPOSITORY:${{ env.RELEASE_VERSION }}|g" \
-          deployments/ci-template.yaml > deployments/ci-test.yaml
-        cat deployments/ci-test.yaml
-        kubectl apply -f deployments/ci-test.yaml
+        GOFLAGS="-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}" \
+          ko resolve -f deployments/ci-template.yaml | kubectl apply -f -
 
     - name: Verify
       run: | 
@@ -87,7 +82,7 @@ jobs:
     - name: Invoke
       run: | 
         set -e
-        
+
         NODE_IP=( $(kubectl get nodes \
           -l kubernetes.io/hostname!=kind-control-plane \
           -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}') )
@@ -108,3 +103,9 @@ jobs:
           echo "invalid version, expected: ${{ env.RELEASE_VERSION }}, got: ${VERSION}"
           exit 1;
         fi
+
+    - name: Publish 
+      run: |
+        KO_DOCKER_REPO=ghcr.io/$GITHUB_REPOSITORY \
+        GOFLAGS="-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}" \
+          ko publish ./cmd/ --bare --tags ${{ env.RELEASE_VERSION }},latest
