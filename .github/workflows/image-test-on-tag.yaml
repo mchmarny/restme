@@ -60,7 +60,7 @@ jobs:
         kubectl get pods -n kube-system
         sleep 5
         for pod in $(kubectl get pods --no-headers -n kube-system -o custom-columns=":metadata.name"); do \
-          kubectl wait --for=condition=ready pod/$pod --timeout=300s -n kube-system; done
+          kubectl wait --for=condition=Ready pod/$pod --timeout=300s -n kube-system; done
 
     - name: Deploy
       run: |
@@ -76,17 +76,16 @@ jobs:
         kubectl get pods -l app=restme
         kubectl get services -l app=restme
         kubectl logs -l app=restme
+        kubectl get nodes -o wide
 
     - name: Invoke
       run: | 
         set -x
 
         # control-plane node doesn't expose the nodeport service
-        NODE_ID=( $(kubectl get nodes -l kubernetes.io/hostname!=kind-control-plane -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}') )
+        NODE_IP=( $(kubectl get nodes -l kubernetes.io/hostname!=kind-control-plane -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}') )
         
-        echo "current-context: ${NODE_ID}"
+        echo "node IP: ${NODE_IP[0]}"
         
         curl -i -H "Content-Type: application/json" \
-          http://${NODE_ID}:30080/v1/request
-
-        
+          http://${NODE_IP[0]}:30080/v1/request
