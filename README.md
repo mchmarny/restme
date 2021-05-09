@@ -1,11 +1,11 @@
 # restme
 
-Collection of REST services to user in platform validation.
+Collection of REST services
 
 ## services 
 
-* [Request](#v1resource)
-* [Resources](#v1resource)
+* [Request](#v1resource) - headers and environment variables 
+* [Resources](#v1resource) - host info, and RAM/CPU resources 
 * [Load](#v1load)
 
 ### /v1/request
@@ -15,96 +15,91 @@ Collection of REST services to user in platform validation.
 ```json
 {
   "request": {
-    "id": "0cc38a00-ae86-11eb-a0c9-e6b1fa9e5990",
-    "time": "2021-05-06T16:13:52.792423514Z",
-    "uri": "/v1/request",
-    "host": "app.domain.com",
-    "method": "GET"
+      "host": "172.18.0.3:30080",
+      "id": "2994eb6e-b0dd-11eb-acc7-3e6bed2cd376",
+      "method": "GET",
+      "path": "/v1/request",
+      "protocol": "HTTP/1.1",
+      "time": "2021-05-09T15:42:29.682509631Z",
+      "version": "v0.3.1"
   },
   "headers": {
-    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "accept-encoding": "gzip, deflate, br",
-    "accept-language": "en-us",
-    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1 Safari/605.1.15",
-    "x-b3-spanid": "81f0***",
-    "x-b3-traceid": "0ed5***",
-    "x-forwarded-by": "proxy.domain.com",
-    "x-forwarded-for": "*.*.*.*",
-    "x-forwarded-info": "Nginx 1.*.0",
-    "x-forwarded-proto": "https",
-    "x-real-ip": "*.*.*.*"
+      "accept": "*/*",
+      "content-type": "application/json",
+      "user-agent": "curl/7.68.0"
   },
   "env_vars": {
-    "APP0_PORT": "tcp://10.1.1.14:80",
-    "APP0_PORT_80_TCP": "tcp://10.1.1.14:80",
-    "APP0_PORT_80_TCP_ADDR": "10.1.1.14.132",
-    "APP0_PORT_80_TCP_PORT": "80",
-    "APP0_PORT_80_TCP_PROTO": "tcp",
-    "APP0_SERVICE_HOST": "10.1.1.14",
-    "APP0_SERVICE_PORT": "80",
-    "APP0_SERVICE_PORT_WEB": "80",
-    "HOME": "/home/nonroot",
-    "HOSTNAME": "app-12345678-x9e8",
-    "KUBERNETES_PORT": "tcp://192.168.0.1:443",
-    "KUBERNETES_PORT_443_TCP": "tcp://192.168.0.1:443",
-    "KUBERNETES_PORT_443_TCP_ADDR": "192.168.0.1",
-    "KUBERNETES_PORT_443_TCP_PORT": "443",
-    "KUBERNETES_PORT_443_TCP_PROTO": "tcp",
-    "KUBERNETES_SERVICE_HOST": "192.168.0.1",
-    "KUBERNETES_SERVICE_PORT": "443",
-    "KUBERNETES_SERVICE_PORT_HTTPS": "443",
-    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      "GIN_MODE": "release",
+      "HOME": "/home/nonroot",
+      "HOSTNAME": "restme-86888bf66-9khgb",
+      "KO_DATA_PATH": "/var/run/ko",
+      "KUBERNETES_PORT": "tcp://10.96.0.1:443",
+      "KUBERNETES_PORT_443_TCP": "tcp://10.96.0.1:443",
+      "KUBERNETES_PORT_443_TCP_ADDR": "10.96.0.1",
+      "KUBERNETES_PORT_443_TCP_PORT": "443",
+      "KUBERNETES_PORT_443_TCP_PROTO": "tcp",
+      "KUBERNETES_SERVICE_HOST": "10.96.0.1",
+      "KUBERNETES_SERVICE_PORT": "443",
+      "KUBERNETES_SERVICE_PORT_HTTPS": "443",
+      "LOG_JSON": "true",
+      "LOG_LEVEL": "debug",
+      "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/ko-app",
+      "RESTME_PORT": "tcp://10.96.125.65:80",
+      "RESTME_PORT_80_TCP": "tcp://10.96.125.65:80",
+      "RESTME_PORT_80_TCP_ADDR": "10.96.125.65",
+      "RESTME_PORT_80_TCP_PORT": "80",
+      "RESTME_PORT_80_TCP_PROTO": "tcp",
+      "RESTME_SERVICE_HOST": "10.96.125.65",
+      "RESTME_SERVICE_PORT": "80",
+      "SSL_CERT_FILE": "/etc/ssl/certs/ca-certificates.crt"
   }
 }
 ```
 
 ### /v1/resource
 
-> Note, values obfuscated and generalized for illustration purposes
-
 ```json
 {
   "request": {
-    "id": "0c923055-ae86-11eb-a0c9-e6b1fa9e5990",
-    "time": "2021-05-06T16:13:52.469001657Z",
-    "uri": "/v1/resource",
-    "host": "app.domain.com",
-    "method": "GET"
+      "host": "172.18.0.3:30080",
+      "id": "2996a496-b0dd-11eb-acc7-3e6bed2cd376",
+      "method": "GET",
+      "path": "/v1/resource",
+      "protocol": "HTTP/1.1",
+      "time": "2021-05-09T15:42:29.693151695Z",
+      "version": "v0.3.1"
   },
   "host": {
-    "hostname": "app-12345678-w5h8b",
-    "uptime": 237181,
-    "boot_time": 1620080451,
-    "processes": 1,
-    "os": "linux",
-    "platform": "debian",
-    "platform_family": "debian",
-    "platform_version": "10.9",
-    "kernel_version": "5.4.77-7.el7pie",
-    "kernel_architecture": "x86_64",
-    "virtualization_system": "kvm",
-    "virtualization_role": "host",
-    "host_id": "046a9c8a-ae88-11eb-8529-0242ac130003"
+      "hostname": "restme-86888bf66-9khgb",
+      "uptime": 275,
+      "boot_time": 1620574675,
+      "processes": 1,
+      "os": "linux",
+      "platform": "debian",
+      "platform_family": "debian",
+      "platform_version": "10.9",
+      "kernel_version": "5.4.0-1046-azure",
+      "kernel_architecture": "x86_64",
+      "host_id": "dbb592b7-88b8-104c-a512-b1ef05c7203a"
   },
   "resources": {
-    "ram": {
-      "value": "376.3G",
-      "context": "Source: OS process status, Size: 376.3G"
-    },
-    "cpu": {
-      "value": 32,
-      "context": "Source: OS process status"
-    }
+      "ram": {
+          "value": "6.8G",
+          "context": "Source: OS process status, Size: 6.8G"
+      },
+      "cpu": {
+          "value": 2,
+          "context": "Source: OS process status"
+      }
   },
   "limits": {
-    "ram": {
-      "value": "512M",
-      "context": "source: /sys/fs/cgroup/memory/memory.limit_in_bytes, writable: false, size: 512M"
-    },
-    "cpu": {
-      "value": 1,
-      "context": "source: /sys/fs/cgroup/cpu/cpu.cfs_quota_us, writable: false"
-    }
+      "ram": {
+          "value": "8388608T",
+          "context": "source: /sys/fs/cgroup/memory/memory.limit_in_bytes, writable: false, size: 8388608T"
+      },
+      "cpu": {
+          "context": "source: /sys/fs/cgroup/cpu/cpu.cfs_quota_us, writable: false"
+      }
   }
 }
 ```
@@ -115,19 +110,38 @@ Collection of REST services to user in platform validation.
 
 ```json
 {
- "request": {
-  "id": "3684ab34-aed8-11eb-ba54-1e00d11edc71",
-  "time": "2021-05-06T19:02:01.57696-07:00",
-  "uri": "/v1/load?duration=5s",
-  "host": "app.domain.com",
-  "method": "GET"
- },
- "result": {
-  "cores": 8,
-  "start": 1620352921,
-  "end": 1620352926,
-  "operations": 8454324,
-  "duration": "5s"
- }
+  "request": {
+      "host": "172.18.0.3:30080",
+      "id": "2a2e9f81-b0dd-11eb-acc7-3e6bed2cd376",
+      "method": "GET",
+      "path": "/v1/load/5s",
+      "protocol": "HTTP/1.1",
+      "time": "2021-05-09T15:42:30.689167384Z",
+      "version": "v0.3.1"
+  },
+  "result": {
+      "cores": 2,
+      "start": 1620574950,
+      "end": 1620574955,
+      "operations": 1467302,
+      "duration": "5s"
+  }
 }
+```
+
+### /v1/echo 
+
+Request:
+
+```shell
+curl -i \
+  -H "Content-Type: application/json" \
+  http://localhost:8080/v1/echo \
+  -d '{ "on": $(shell date +%s), "msg": "hello?" }'
+```
+
+Response: 
+
+```json
+{ "on": 1620438323, "msg": "hello?" }
 ```

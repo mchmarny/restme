@@ -56,7 +56,7 @@ func (h *Handler) getRequestMetadata(c *gin.Context) gin.H {
 		"id":       id.String(),
 		"time":     time.Now().UTC(),
 		"version":  h.logger.Version,
-		"path":     c.FullPath(),
+		"path":     c.Request.URL.EscapedPath(),
 		"protocol": c.Request.Proto,
 		"host":     c.Request.Host,
 		"method":   c.Request.Method,
