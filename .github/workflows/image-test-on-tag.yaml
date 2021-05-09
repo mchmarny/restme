@@ -55,6 +55,7 @@ jobs:
 
     - name: Status
       run: |
+        set -x
         kubectl cluster-info
         echo "current-context:" $(kubectl config current-context)
         kubectl get pods -n kube-system
@@ -64,6 +65,7 @@ jobs:
 
     - name: Deploy
       run: |
+        set -x
         echo "current-context:" $(kubectl config current-context)
         sed "s|IMAGE_URI|ghcr.io/$GITHUB_REPOSITORY:${{ env.RELEASE_VERSION }}|g" \
           deployments/ci-template.yaml > deployments/ci-test.yaml
@@ -72,6 +74,7 @@ jobs:
 
     - name: Verify
       run: | 
+        set -x
         kubectl rollout status deployment/restme
         kubectl get pods -l app=restme
         kubectl get services -l app=restme
@@ -82,7 +85,6 @@ jobs:
       run: | 
         set -x
 
-        # control-plane node doesn't expose the nodeport service
         NODE_IP=( $(kubectl get nodes -l kubernetes.io/hostname!=kind-control-plane -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}') )
         
         echo "node IP: ${NODE_IP[0]}"
