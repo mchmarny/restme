@@ -1,4 +1,4 @@
-name: Push and PR Test
+name: PRB Test
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
   
 jobs:
 
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
 

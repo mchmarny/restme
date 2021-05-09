@@ -1,4 +1,4 @@
-name: Image on Tag
+name: E2E Test
 
 on:  
   push:
@@ -7,7 +7,7 @@ on:
   
 jobs:
 
-  build:
+  e2e-test:
     runs-on: ubuntu-latest
     steps:
 
@@ -55,7 +55,6 @@ jobs:
 
     - name: Status
       run: |
-        set -x
         kubectl cluster-info
         echo "current-context:" $(kubectl config current-context)
         kubectl get pods -n kube-system
@@ -65,7 +64,6 @@ jobs:
 
     - name: Deploy
       run: |
-        set -x
         echo "current-context:" $(kubectl config current-context)
         sed "s|IMAGE_URI|ghcr.io/$GITHUB_REPOSITORY:${{ env.RELEASE_VERSION }}|g" \
           deployments/ci-template.yaml > deployments/ci-test.yaml
@@ -74,7 +72,6 @@ jobs:
 
     - name: Verify
       run: | 
-        set -x
         kubectl rollout status deployment/restme
         kubectl get pods -l app=restme
         kubectl get services -l app=restme
@@ -83,11 +80,9 @@ jobs:
 
     - name: Invoke
       run: | 
-        set -x
-
-        NODE_IP=( $(kubectl get nodes -l kubernetes.io/hostname!=kind-control-plane -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}') )
-        
-        echo "node IP: ${NODE_IP[0]}"
+        NODE_IP=( $(kubectl get nodes \
+          -l kubernetes.io/hostname!=kind-control-plane \
+          -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}') )
         
         curl -i -H "Content-Type: application/json" \
           http://${NODE_IP[0]}:30080/v1/request
