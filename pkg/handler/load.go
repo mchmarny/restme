@@ -10,11 +10,11 @@ import (
 
 // Load represents simple HTTP load result
 type LoadResult struct {
-	Request *RequestMetadata    `json:"request,omitempty"`
+	Request gin.H               `json:"request,omitempty"`
 	Result  *load.CPULoadResult `json:"result,omitempty"`
 }
 
-func LoadHandler(c *gin.Context) {
+func (h *Handler) LoadHandler(c *gin.Context) {
 	durStr := c.Param("duration")
 	duration, err := time.ParseDuration(durStr)
 	if err != nil {
@@ -23,7 +23,7 @@ func LoadHandler(c *gin.Context) {
 	}
 
 	result := &LoadResult{
-		Request: getRequestMetadata(c),
+		Request: h.getRequestMetadata(c),
 		Result:  load.MakeCPULoad(duration),
 	}
 

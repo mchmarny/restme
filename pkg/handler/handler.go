@@ -7,9 +7,37 @@ import (
 	"github.com/mchmarny/restme/pkg/log"
 )
 
-func DefaultHandler(c *gin.Context) {
+func NewHandler(logger *log.Logger) *Handler {
+	gin.ForceConsoleColor()
+	r := gin.New()
+	r.Use(gin.Recovery())
+	r.Use(gin.Logger())
+	r.Use(Options)
+
+	h := &Handler{
+		logger: logger,
+		Engine: r,
+	}
+
+	r.GET("/", h.DefaultHandler)
+
+	v1 := r.Group("/v1")
+	v1.POST("/echo", h.EchoHandler)
+	v1.GET("/load/:duration", h.LoadHandler)
+	v1.GET("/resource", h.ResourceHandler)
+	v1.GET("/request", h.RequestHandler)
+
+	return h
+}
+
+type Handler struct {
+	logger *log.Logger
+	Engine *gin.Engine
+}
+
+func (h *Handler) DefaultHandler(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"request": getRequestMetadata(c),
+		"request": h.getRequestMetadata(c),
 		"routes": []string{
 			"POST /v1/echo",
 			"GET /v1/load/:duration (e.g. 5s)",
@@ -17,27 +45,6 @@ func DefaultHandler(c *gin.Context) {
 			"GET /v1/resource",
 		},
 	})
-}
-
-func SetupRouter(name, version string, logger *log.Logger) *gin.Engine {
-	gin.ForceConsoleColor()
-	r := gin.New()
-	r.Use(gin.Recovery())
-	r.Use(gin.Logger())
-	r.Use(Options)
-
-	r.GET("/", DefaultHandler)
-
-	v1 := r.Group("/v1")
-	{
-		echoHandler := NewEchoHandler(logger)
-		v1.POST("/echo", echoHandler.EchoHandler)
-
-		v1.GET("/load/:duration", LoadHandler)
-		v1.GET("/resource", ResourceHandler)
-		v1.GET("/request", RequestHandler)
-	}
-	return r
 }
 
 // Options midleware adds options headers.

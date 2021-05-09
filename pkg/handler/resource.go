@@ -9,15 +9,15 @@ import (
 
 // Resource represents simple Kube resource
 type Resource struct {
-	Request   *RequestMetadata      `json:"request,omitempty"`
+	Request   gin.H                 `json:"request,omitempty"`
 	Host      *runtime.HostInfo     `json:"host,omitempty"`
 	Resources *runtime.ResourceInfo `json:"resources,omitempty"`
 	Limits    *runtime.ResourceInfo `json:"limits,omitempty"`
 }
 
-func ResourceHandler(c *gin.Context) {
+func (h *Handler) ResourceHandler(c *gin.Context) {
 	result := &Resource{
-		Request:   getRequestMetadata(c),
+		Request:   h.getRequestMetadata(c),
 		Host:      runtime.GetHostInfo(),
 		Resources: runtime.GetResourceInfo(),
 		Limits:    runtime.GetLimits(),

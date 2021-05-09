@@ -27,11 +27,13 @@ var (
 )
 
 func main() {
-	logger := log.New(appName)
+	logger := log.New(appName, version)
+
+	h := handler.NewHandler(logger)
 
 	s := &http.Server{
 		Addr:           address,
-		Handler:        handler.SetupRouter(appName, version, logger),
+		Handler:        h.Engine,
 		ReadTimeout:    serverTimeoutSeconds * time.Second,
 		WriteTimeout:   serverTimeoutSeconds * time.Second,
 		MaxHeaderBytes: 1 << serverMaxHeaderBytes,

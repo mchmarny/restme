@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -14,24 +13,14 @@ import (
 
 // Request represents simple HTTP resource
 type Request struct {
-	Request *RequestMetadata       `json:"request,omitempty"`
+	Request gin.H                  `json:"request,omitempty"`
 	Headers map[string]interface{} `json:"headers"`
 	EnvVars map[string]interface{} `json:"env_vars"`
 }
 
-// RequestMetadata represents metadata of the request
-type RequestMetadata struct {
-	ID       string    `json:"id"`
-	On       time.Time `json:"time"`
-	Path     string    `json:"path"`
-	Protocol string    `json:"protocol"`
-	Host     string    `json:"host"`
-	Method   string    `json:"method"`
-}
-
-func RequestHandler(c *gin.Context) {
+func (h *Handler) RequestHandler(c *gin.Context) {
 	result := &Request{
-		Request: getRequestMetadata(c),
+		Request: h.getRequestMetadata(c),
 		Headers: make(map[string]interface{}),
 		EnvVars: make(map[string]interface{}),
 	}
@@ -57,18 +46,19 @@ func RequestHandler(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, result)
 }
 
-func getRequestMetadata(c *gin.Context) *RequestMetadata {
+func (h *Handler) getRequestMetadata(c *gin.Context) gin.H {
 	id, err := uuid.NewUUID()
 	if err != nil {
-		log.Fatalf("Error while getting id: %v\n", err)
+		h.logger.Errorf("Error while getting id: %v\n", err)
 	}
 
-	return &RequestMetadata{
-		ID:       id.String(),
-		On:       time.Now().UTC(),
-		Path:     c.FullPath(),
-		Protocol: c.Request.Proto,
-		Host:     c.Request.Host,
-		Method:   c.Request.Method,
+	return gin.H{
+		"id":       id.String(),
+		"time":     time.Now().UTC(),
+		"version":  h.logger.Version,
+		"path":     c.FullPath(),
+		"protocol": c.Request.Proto,
+		"host":     c.Request.Host,
+		"method":   c.Request.Method,
 	}
 }

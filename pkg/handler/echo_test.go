@@ -12,7 +12,7 @@ import (
 )
 
 func TestEchoHandler(t *testing.T) {
-	router := getTestRouter()
+	h := NewHandler(testLogger)
 
 	m := message{
 		On:      time.Now().Unix(),
@@ -24,7 +24,7 @@ func TestEchoHandler(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/v1/echo", bytes.NewBuffer(b))
-	router.ServeHTTP(w, req)
+	h.Engine.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 

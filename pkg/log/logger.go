@@ -12,7 +12,7 @@ const (
 )
 
 // New is a project global creator of logger
-func New(name string) *Logger {
+func New(name, version string) *Logger {
 	l := logrus.New()
 	l.SetOutput(os.Stdout)
 	l.SetReportCaller(true)
@@ -43,17 +43,20 @@ func New(name string) *Logger {
 	}
 
 	return &Logger{
-		name: name,
+		Name:    name,
+		Version: version,
 		logger: l.WithFields(logrus.Fields{
-			"app": name,
+			"app":     name,
+			"version": version,
 		}),
 	}
 }
 
 // Logger is the internal logrus abstraction
 type Logger struct {
-	name   string
-	logger *logrus.Entry
+	Version string
+	Name    string
+	logger  *logrus.Entry
 }
 
 // GetLevel returns the logger configured level.

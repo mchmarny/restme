@@ -9,11 +9,11 @@ import (
 )
 
 func TestRequestHandler(t *testing.T) {
-	router := getTestRouter()
+	h := NewHandler(testLogger)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/v1/request", nil)
-	router.ServeHTTP(w, req)
+	h.Engine.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 }
