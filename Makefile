@@ -39,7 +39,7 @@ build: ## Compiles the code.
 dispatch: ## Sends test image build command
 	curl -i -H "Accept: application/vnd.github.v3+json" \
 		-H "Authorization: token ${GITHUB_TOKEN}" \
-		https://api.github.com/repos/mchmarny/rester/dispatches \
+		https://api.github.com/repos/mchmarny/restme/dispatches \
 		-d '{ "event_type": "build", "client_payload": { "ts": $(shell date +%s) }}'
 .PHONY: dispatch
 
