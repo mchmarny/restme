@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rester
+  name: restme
   labels:
-    app: rester
+    app: restme
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rester
+      app: restme
   template:
     metadata:
       labels:
-        app: rester
+        app: restme
     spec:
       containers:
-      - name: rester
+      - name: restme
         image: IMAGE_URI
         ports:
         - containerPort: 8080
@@ -31,12 +31,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: rester
+  name: restme
   labels:
-    app: rester
+    app: restme
 spec:
   selector:
-    app: rester
+    app: restme
   ports:
     - port: 80
       targetPort: 8080

@@ -72,10 +72,18 @@ jobs:
 
     - name: Verify
       run: | 
-        kubectl rollout status deployment/rester
-        kubectl get pods -l app=rester
-        kubectl get services -l app=rester
-        kubectl logs -l app=rester
+        kubectl rollout status deployment/restme
+        kubectl get pods -l app=restme
+        kubectl get services -l app=restme
+        kubectl logs -l app=restme
 
+    - name: Invoke
+      run: | 
+        kubectl exec -it ghcr.io/mchmarny/test-image:v0.3.1 -- curl \
+          curl -i -H "Content-Type: application/json" \
+          http://restme.default.svc.cluster.local/v1/request
+
+
+        
 
         

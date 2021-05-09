@@ -36,13 +36,6 @@ build: ## Compiles the code.
 	GIN_MODE=release LOG_JSON=true bin/rester
 .PHONY: build
 
-dispatch: ## Sends test image build command
-	curl -i -H "Accept: application/vnd.github.v3+json" \
-		-H "Authorization: token ${GITHUB_TOKEN}" \
-		https://api.github.com/repos/mchmarny/restme/dispatches \
-		-d '{ "event_type": "build", "client_payload": { "ts": $(shell date +%s) }}'
-.PHONY: dispatch
-
 upgrade: ## Upgrades all dependancies 
 	go get -u ./...
 	go mod tidy 
