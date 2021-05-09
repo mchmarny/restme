@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -euo pipefail
+
+readonly URL=$1
+readonly VERSION=$2
+
+main() {
+    local current=$(curl -H "Content-Type: application/json" \
+        "${URL}/v1/request" | jq -r ".request.version")
+
+    if [ "$current" != "$VERSION" ]; then
+        printf "invalid version, expected: ${VERSION}, got: ${current}\n"
+        exit 1
+    fi
+    printf "\n"
+}
+
+main
+
