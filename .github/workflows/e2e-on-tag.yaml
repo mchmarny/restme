@@ -41,10 +41,11 @@ jobs:
       run: |
         echo "RELEASE_VERSION=$(make version)" >> $GITHUB_ENV
         
+    - name: Ko
+      uses: imjasonh/setup-ko@v0.4
+
     - name: Dependency
       run: |
-        GO111MODULE=on go get github.com/google/ko/cmd/ko@master
-
         wget http://stedolan.github.io/jq/download/linux64/jq
         chmod +x ./jq
         sudo cp jq /usr/bin
@@ -97,7 +98,7 @@ jobs:
           http://${NODE_IP[0]}:30080/v1/load/5s
 
         VERSION=$(curl -H "Content-Type: application/json" \
-          http://${NODE_IP[0]}:30080/v1/request | jq ".request.version")
+          http://${NODE_IP[0]}:30080/v1/request | jq -r ".request.version")
         
         if [ "$VERSION" != "${{ env.RELEASE_VERSION }}" ]; then
           echo "invalid version, expected: ${{ env.RELEASE_VERSION }}, got: ${VERSION}"
