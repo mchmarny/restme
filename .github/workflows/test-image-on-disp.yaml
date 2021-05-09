@@ -1,4 +1,4 @@
-name: Search Topic
+name: Build Test
 
 on: 
   repository_dispatch:
