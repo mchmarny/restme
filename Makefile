@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.2.24
+RELEASE_VERSION  ?=v0.2.25
 KO_DOCKER_REPO   ?=ghcr.io/mchmarny
 
 all: help
@@ -35,6 +35,13 @@ build: ## Compiles the code.
 	CGO_ENABLED=0 go build -a -mod vendor -o bin/rester ./cmd/
 	GIN_MODE=release LOG_JSON=true bin/rester
 .PHONY: build
+
+dispatch: ## Sends test image build command
+	curl -i -H "Accept: application/vnd.github.v3+json" \
+		-H "Authorization: token ${GITHUB_TOKEN}" \
+		https://api.github.com/repos/mchmarny/rester/dispatches \
+		-d '{ "event_type": "build", "client_payload": { "ts": $(shell date +%s) }}'
+.PHONY: dispatch
 
 upgrade: ## Upgrades all dependancies 
 	go get -u ./...
