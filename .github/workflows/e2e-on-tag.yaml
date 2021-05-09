@@ -86,7 +86,8 @@ jobs:
 
     - name: Test Integration
       run: | 
-        test/integration "http://${NODE_IP[0]}:30080" "${{ env.RELEASE_VERSION }}"
+        test/integration "http://${NODE_IP[0]}:30080" \
+                         "${{ env.RELEASE_VERSION }}"
 
     - name: Publish Image
       run: |
