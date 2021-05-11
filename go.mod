@@ -22,7 +22,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
 	github.com/ugorji/go v1.2.5 // indirect
 	golang.org/x/crypto v0.0.0-20210506145944-38f3c27a63bf // indirect
-	golang.org/x/sys v0.0.0-20210507161434-a76c4d0a0096
+	golang.org/x/sys v0.0.0-20210511113859-b0526f3d8744
 	golang.org/x/text v0.3.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	howett.net/plist v0.0.0-20201203080718-1454fab16a06 // indirect
