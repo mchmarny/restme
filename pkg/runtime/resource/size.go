@@ -1,4 +1,4 @@
-package runtime
+package resource
 
 import (
 	"strconv"

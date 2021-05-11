@@ -4,18 +4,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mchmarny/restme/pkg/log"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestCPULoad(t *testing.T) {
-	d, _ := time.ParseDuration("2s")
-	c := MakeCPULoad(d)
-	t.Logf("count: %+v", c)
-}
 
 func TestCPULoadHandler(t *testing.T) {
 	s := NewService(log.Default())

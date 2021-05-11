@@ -1,4 +1,4 @@
-package runtime
+package resource
 
 import (
 	"fmt"
@@ -18,8 +18,8 @@ const (
 )
 
 // GetLimits retreaves limits based on cgroups
-func GetLimits() *ResourceInfo {
-	limit := &ResourceInfo{
+func GetLimits() *Info {
+	limit := &Info{
 		RAM: &Measurement{},
 		CPU: &Measurement{},
 	}

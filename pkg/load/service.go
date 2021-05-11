@@ -5,13 +5,14 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mchmarny/restme/pkg/load/cpu"
 	"github.com/mchmarny/restme/pkg/log"
 )
 
 // Info represents simple HTTP load result
 type Info struct {
-	Request gin.H          `json:"request,omitempty"`
-	Result  *CPULoadResult `json:"result,omitempty"`
+	Request gin.H           `json:"request,omitempty"`
+	Result  *cpu.LoadResult `json:"result,omitempty"`
 }
 
 // NewLoadService creates new LoadService instance.
@@ -39,7 +40,7 @@ func (s *Service) CPULoadHandler(c *gin.Context) {
 			"time":     time.Now().UTC(),
 			"duration": duration,
 		},
-		Result: MakeCPULoad(duration),
+		Result: cpu.MakeCPULoad(duration),
 	}
 
 	c.IndentedJSON(http.StatusOK, result)

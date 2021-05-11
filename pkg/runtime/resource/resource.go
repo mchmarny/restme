@@ -1,4 +1,4 @@
-package runtime
+package resource
 
 import (
 	"encoding/json"
@@ -14,22 +14,22 @@ type Measurement struct {
 	Context string      `json:"context,omitempty"`
 }
 
-// ResourceInfo represents node cpu
-type ResourceInfo struct {
+// Info represents node resource info.
+type Info struct {
 	RAM *Measurement `json:"ram,omitempty"`
 	CPU *Measurement `json:"cpu,omitempty"`
 	GPU *Measurement `json:"gpu,omitempty"`
 }
 
 // String returns the JSON serialized representation of the object
-func (h *ResourceInfo) String() string {
+func (h *Info) String() string {
 	s, _ := json.Marshal(h)
 	return string(s)
 }
 
 // GetResourceInfo retreaves node info
-func GetResourceInfo() *ResourceInfo {
-	resource := &ResourceInfo{
+func GetResourceInfo() *Info {
+	resource := &Info{
 		RAM: &Measurement{},
 		CPU: &Measurement{},
 	}

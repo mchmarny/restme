@@ -1,4 +1,4 @@
-package load
+package cpu
 
 import (
 	"encoding/json"
@@ -7,7 +7,8 @@ import (
 	"time"
 )
 
-type CPULoadResult struct {
+// LoadResult represents result of CPU load.
+type LoadResult struct {
 	Cores      int    `json:"cores,omitempty"`
 	Start      int64  `json:"start,omitempty"`
 	End        int64  `json:"end,omitempty"`
@@ -15,14 +16,14 @@ type CPULoadResult struct {
 	Duration   string `json:"duration,omitempty"`
 }
 
-// String returns the JSON serialized representation of the object
-func (r *CPULoadResult) String() string {
+// String returns the JSON serialized representation of the object.
+func (r *LoadResult) String() string {
 	s, _ := json.Marshal(r)
 	return string(s)
 }
 
 // MakeCPULoad creates CPU load for specified duration.
-func MakeCPULoad(duration time.Duration) *CPULoadResult {
+func MakeCPULoad(duration time.Duration) *LoadResult {
 	cores := runtime.NumCPU()
 	runtime.GOMAXPROCS(cores)
 
@@ -54,7 +55,7 @@ func MakeCPULoad(duration time.Duration) *CPULoadResult {
 		}
 	}
 
-	return &CPULoadResult{
+	return &LoadResult{
 		Start:      start.Unix(),
 		End:        time.Now().Unix(),
 		Duration:   duration.String(),

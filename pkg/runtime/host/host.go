@@ -1,4 +1,4 @@
-package runtime
+package host
 
 import (
 	"encoding/json"
@@ -6,9 +6,9 @@ import (
 	"github.com/shirou/gopsutil/host"
 )
 
-// HostInfo represents the info about this host.
+// Info represents the info about this host.
 // This is a copy of the gopsutil struct to align JSON names
-type HostInfo struct {
+type Info struct {
 	Hostname             string `json:"hostname,omitempty"`
 	Uptime               uint64 `json:"uptime,omitempty"`
 	BootTime             uint64 `json:"boot_time,omitempty"`
@@ -26,14 +26,14 @@ type HostInfo struct {
 }
 
 // String returns the JSON serialized representation of the object
-func (h *HostInfo) String() string {
+func (h *Info) String() string {
 	s, _ := json.Marshal(h)
 	return string(s)
 }
 
 // GetHostInfo retreaves node info
-func GetHostInfo() *HostInfo {
-	h := &HostInfo{}
+func GetHostInfo() *Info {
+	h := &Info{}
 	info, err := host.Info()
 	if err != nil {
 		h.Error = err
