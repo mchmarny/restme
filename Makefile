@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.3.14
+RELEASE_VERSION  ?=v0.4.1
 KO_DOCKER_REPO   ?=ghcr.io/mchmarny
 
 all: help
@@ -27,7 +27,7 @@ run: ## Runs uncompiled Go code
 
 message: ## Invokes echo service 
 	curl -i -H "Content-Type: application/json" \
-		http://localhost:8080/v1/echo \
+		http://localhost:8080/v1/echo/message \
 		-d '{ "on": $(shell date +%s), "msg": "hello?" }'
 .PHONY: message
 

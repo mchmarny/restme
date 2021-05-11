@@ -1,29 +1,25 @@
-package handler
+package runtime
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/mchmarny/restme/pkg/log"
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	testLoggerName    = "test"
-	testLoggerVersion = "v0.0.1-test"
-)
+func TestResourceHandler(t *testing.T) {
+	s := NewService(log.Default())
+	assert.NotNil(t, s)
 
-var (
-	testLogger = log.New(testLoggerName, testLoggerVersion)
-)
-
-func TestDefaultHandler(t *testing.T) {
-	h := NewHandler(testLogger)
+	r := gin.Default()
+	r.GET("/", s.ResourceHandler)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/", nil)
-	h.Engine.ServeHTTP(w, req)
+	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 }

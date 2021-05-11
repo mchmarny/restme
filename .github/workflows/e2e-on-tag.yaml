@@ -91,7 +91,8 @@ jobs:
           -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}') )
         SERVICE_URL="http://${NODE_IP[0]}:30080"
 
-        test/integration "${SERVICE_URL}" "${{ env.RELEASE_VERSION }}"
+        test/endpoints "${SERVICE_URL}"
+        test/version "${SERVICE_URL}" "${{ env.RELEASE_VERSION }}"
 
     - name: Publish Image
       run: |

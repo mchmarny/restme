@@ -7,9 +7,16 @@ import (
 )
 
 const (
+	AppNameDefault    = "restme"
+	AppVersionDefault = "v0.0.1v"
+
 	LogLevelEnvVar = "LOG_LEVEL"
 	LogJSONEnvVar  = "LOG_JSON"
 )
+
+func Default() *Logger {
+	return New(AppNameDefault, AppVersionDefault)
+}
 
 // New is a project global creator of logger
 func New(name, version string) *Logger {
@@ -43,8 +50,8 @@ func New(name, version string) *Logger {
 	}
 
 	return &Logger{
-		Name:    name,
-		Version: version,
+		name:    name,
+		version: version,
 		logger: l.WithFields(logrus.Fields{
 			"app":     name,
 			"version": version,
@@ -54,9 +61,19 @@ func New(name, version string) *Logger {
 
 // Logger is the internal logrus abstraction
 type Logger struct {
-	Version string
-	Name    string
+	version string
+	name    string
 	logger  *logrus.Entry
+}
+
+// GetAppVersion returns app version.
+func (l *Logger) GetAppVersion() string {
+	return l.version
+}
+
+// GetAppName returns app name.
+func (l *Logger) GetAppName() string {
+	return l.name
 }
 
 // GetLevel returns the logger configured level.

@@ -2,15 +2,20 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/mchmarny/restme/pkg/config"
-	"github.com/mchmarny/restme/pkg/handler"
+	"github.com/mchmarny/restme/pkg/echo"
+	"github.com/mchmarny/restme/pkg/load"
 	"github.com/mchmarny/restme/pkg/log"
+	"github.com/mchmarny/restme/pkg/request"
+	"github.com/mchmarny/restme/pkg/runtime"
 )
 
 const (
@@ -26,14 +31,80 @@ var (
 	address = config.GetEnv("ADDRESS", ":8080")
 )
 
+func makeRouter(logger *log.Logger) *gin.Engine {
+	gin.ForceConsoleColor()
+
+	r := gin.New()
+
+	r.Use(gin.Recovery())
+	r.Use(gin.Logger())
+	r.Use(options)
+
+	v1 := r.Group("/v1")
+	{
+		echoGroup := v1.Group("/echo")
+		{
+			echoService := echo.NewService(logger)
+			echoGroup.POST("/message", echoService.MessageHandler)
+		}
+
+		reqGroup := v1.Group(("/request"))
+		{
+			reqService := request.NewService(logger)
+			reqGroup.GET("/info", reqService.RequestHandler)
+		}
+
+		runtimeGroup := v1.Group("/runtime")
+		{
+			resourceService := runtime.NewService(logger)
+			runtimeGroup.GET("/info", resourceService.ResourceHandler)
+		}
+
+		loadGroup := v1.Group("/load")
+		{
+			loadService := load.NewService(logger)
+			cpuLoadGroup := loadGroup.Group("/cpu")
+			cpuLoadGroup.GET("/:duration", loadService.CPULoadHandler)
+		}
+	}
+
+	return r
+}
+
+// options midleware adds options headers.
+func options(c *gin.Context) {
+	if c.Request.Method != "OPTIONS" {
+		c.Next()
+	} else {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "POST,OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "authorization, origin, content-type, accept")
+		c.Header("Allow", "POST,OPTIONS")
+		c.Header("Content-Type", "application/json")
+		c.AbortWithStatus(http.StatusOK)
+	}
+}
+
 func main() {
 	logger := log.New(appName, version)
 
-	h := handler.NewHandler(logger)
+	r := makeRouter(logger)
+
+	routes := []string{}
+	routeInfo := r.Routes()
+	for _, info := range routeInfo {
+		routes = append(routes, fmt.Sprintf("%-7s %s", info.Method, info.Path))
+	}
+
+	r.GET("/", func(c *gin.Context) {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"routes": routes,
+		})
+	})
 
 	s := &http.Server{
 		Addr:           address,
-		Handler:        h.Engine,
+		Handler:        r,
 		ReadTimeout:    serverTimeoutSeconds * time.Second,
 		WriteTimeout:   serverTimeoutSeconds * time.Second,
 		MaxHeaderBytes: 1 << serverMaxHeaderBytes,

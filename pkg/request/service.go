@@ -1,4 +1,4 @@
-package handler
+package request
 
 import (
 	"fmt"
@@ -9,18 +9,25 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/mchmarny/restme/pkg/log"
 )
 
-// Request represents simple HTTP resource
-type Request struct {
-	Request gin.H                  `json:"request,omitempty"`
-	Headers map[string]interface{} `json:"headers"`
-	EnvVars map[string]interface{} `json:"env_vars"`
+// NewRequestService creates new RequestService instance.
+func NewService(logger *log.Logger) *Service {
+	return &Service{
+		logger: logger,
+	}
 }
 
-func (h *Handler) RequestHandler(c *gin.Context) {
-	result := &Request{
-		Request: h.getRequestMetadata(c),
+// Service provides object representing the inbound HTTP request.
+type Service struct {
+	logger *log.Logger
+}
+
+// RequestHandler handles the inbound requests.
+func (s *Service) RequestHandler(c *gin.Context) {
+	result := &Response{
+		Request: s.getRequestMetadata(c),
 		Headers: make(map[string]interface{}),
 		EnvVars: make(map[string]interface{}),
 	}
@@ -46,16 +53,16 @@ func (h *Handler) RequestHandler(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, result)
 }
 
-func (h *Handler) getRequestMetadata(c *gin.Context) gin.H {
+func (s *Service) getRequestMetadata(c *gin.Context) gin.H {
 	id, err := uuid.NewUUID()
 	if err != nil {
-		h.logger.Errorf("Error while getting id: %v\n", err)
+		s.logger.Errorf("Error while getting id: %v\n", err)
 	}
 
 	return gin.H{
 		"id":       id.String(),
 		"time":     time.Now().UTC(),
-		"version":  h.logger.Version,
+		"version":  s.logger.GetAppVersion(),
 		"path":     c.Request.URL.EscapedPath(),
 		"protocol": c.Request.Proto,
 		"host":     c.Request.Host,

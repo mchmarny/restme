@@ -1,4 +1,4 @@
-package handler
+package echo
 
 import (
 	"bytes"
@@ -8,13 +8,19 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
+	"github.com/mchmarny/restme/pkg/log"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestEchoHandler(t *testing.T) {
-	h := NewHandler(testLogger)
+	s := NewService(log.Default())
+	assert.NotNil(t, s)
 
-	m := message{
+	r := gin.Default()
+	r.POST("/", s.MessageHandler)
+
+	m := Message{
 		On:      time.Now().Unix(),
 		Message: "test",
 	}
@@ -23,12 +29,12 @@ func TestEchoHandler(t *testing.T) {
 	assert.Nil(t, err)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/v1/echo", bytes.NewBuffer(b))
-	h.Engine.ServeHTTP(w, req)
+	req, _ := http.NewRequest(http.MethodPost, "/", bytes.NewBuffer(b))
+	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var m2 message
+	var m2 Message
 	err = json.NewDecoder(w.Result().Body).Decode(&m2)
 	assert.Nilf(t, err, "error decoding body: %v", err)
 
