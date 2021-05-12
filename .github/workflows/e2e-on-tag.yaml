@@ -82,10 +82,10 @@ jobs:
 
     - name: Verify Deployment
       run: | 
-        kubectl rollout status deployment/restme
         kubectl get pods -l app=restme
-        kubectl get services -l app=restme
+        kubectl describe pods -l app=restme
         kubectl logs -l app=restme
+        kubectl get services -l app=restme
         kubectl get nodes -o wide
 
     - name: Test Integration 
@@ -94,9 +94,9 @@ jobs:
           -l kubernetes.io/hostname!=kind-control-plane \
           -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}') )
         SERVICE_URL="http://${NODE_IP[0]}:30080"
-
-        test/endpoints "${SERVICE_URL}"
-        test/version "${SERVICE_URL}" "${{ env.RELEASE_VERSION }}"
+        TOKEN=$(cat test/test.token)
+        AUTH_TOKEN="${TOKEN}" test/endpoints "${SERVICE_URL}"
+        AUTH_TOKEN="${TOKEN}" test/version "${SERVICE_URL}" "${{ env.RELEASE_VERSION }}"
 
     - name: Publish Image
       run: |
