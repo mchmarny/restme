@@ -32,7 +32,7 @@ spec:
         - name: GIN_MODE
           value: "release"
         - name: KEY_FILE
-          value: "/etc/auth-key"
+          value: "/etc/auth-key/key"
         volumeMounts:
         - name: auth-key-volume
           readOnly: true

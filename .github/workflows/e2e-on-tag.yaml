@@ -71,7 +71,7 @@ jobs:
 
     - name: Configure Cluster 
       run: | 
-        kubectl create secret generic auth-key --from-file=auth-key=./test/test.key
+        kubectl create secret generic auth-key --from-file=key=./test/test.key
 
     - name: Deploy Service
       run: |
