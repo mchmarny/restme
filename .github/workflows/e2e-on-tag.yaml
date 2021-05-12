@@ -85,8 +85,11 @@ jobs:
         kubectl get pods -l app=restme
         kubectl describe pods -l app=restme
         kubectl logs -l app=restme
+        kubectl rollout status deployment/restme
+        
         kubectl get services -l app=restme
         kubectl get nodes -o wide
+        
 
     - name: Test Integration 
       run: | 
