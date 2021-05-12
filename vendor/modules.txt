@@ -3,6 +3,9 @@
 github.com/StackExchange/wmi
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
+# github.com/dgrijalva/jwt-go v3.2.0+incompatible
+## explicit
+github.com/dgrijalva/jwt-go
 # github.com/ghodss/yaml v1.0.0
 github.com/ghodss/yaml
 # github.com/gin-contrib/sse v0.1.0

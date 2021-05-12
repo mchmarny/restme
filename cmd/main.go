@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mchmarny/restme/pkg/auth"
 	"github.com/mchmarny/restme/pkg/config"
 	"github.com/mchmarny/restme/pkg/echo"
 	"github.com/mchmarny/restme/pkg/load"
@@ -27,11 +28,12 @@ const (
 )
 
 var (
-	version = "v0.0.1-default"
-	address = config.GetEnv("ADDRESS", ":8080")
+	version     = "v0.0.1-default"
+	address     = config.GetEnv("ADDRESS", ":8080")
+	authKeyPath = config.GetEnv("KEY_FILE", "./auth.key")
 )
 
-func makeRouter(logger *log.Logger) *gin.Engine {
+func makeRouter(authenticator *auth.TokenAuthenticator, logger *log.Logger) *gin.Engine {
 	gin.ForceConsoleColor()
 
 	r := gin.New()
@@ -40,7 +42,7 @@ func makeRouter(logger *log.Logger) *gin.Engine {
 	r.Use(gin.Logger())
 	r.Use(options)
 
-	v1 := r.Group("/v1")
+	v1 := r.Group("/v1", authenticator.Authenticate())
 	{
 		echoGroup := v1.Group("/echo")
 		{
@@ -88,7 +90,12 @@ func options(c *gin.Context) {
 func main() {
 	logger := log.New(appName, version)
 
-	r := makeRouter(logger)
+	a, err := auth.NewTokenAuthenticator(authKeyPath, logger)
+	if err != nil {
+		logger.Fatalf("error creating token authenticator: %s\n", err)
+	}
+
+	r := makeRouter(a, logger)
 
 	routes := []string{}
 	routeInfo := r.Routes()

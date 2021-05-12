@@ -69,6 +69,10 @@ jobs:
         for pod in $(kubectl get pods --no-headers -n kube-system -o custom-columns=":metadata.name"); do \
           kubectl wait --for=condition=Ready pod/$pod --timeout=300s -n kube-system; done
 
+    - name: Configure Cluster 
+      run: | 
+        kubectl create secret generic auth-key --from-file=auth-key=./test/test.key
+
     - name: Deploy Service
       run: |
         echo "current-context:" $(kubectl config current-context)

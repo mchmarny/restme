@@ -1,6 +1,7 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.4.1
+RELEASE_VERSION  ?=v0.4.2
 KO_DOCKER_REPO   ?=ghcr.io/mchmarny
+TEST_AUTH_TOKEN  ?=test/test.token
 
 all: help
 
@@ -22,13 +23,19 @@ lint: ## Lints the entire project
 .PHONY: lint
 
 run: ## Runs uncompiled Go code
-	LOG_LEVEL=debug go run ./cmd/main.go
+	LOG_LEVEL=debug ADDRESS=":8080" KEY_FILE="test/test.key" go run ./cmd/main.go
 .PHONY: run
 
+verify: ## Runs verification test against the running service
+	AUTH_TOKEN="$(shell cat $(TEST_AUTH_TOKEN))" test/endpoints "http://localhost:8080"
+.PHONY: verify
+
 message: ## Invokes echo service 
-	curl -i -H "Content-Type: application/json" \
-		http://localhost:8080/v1/echo/message \
-		-d '{ "on": $(shell date +%s), "msg": "hello?" }'
+	curl -i \
+	     -H "Content-Type: application/json" \
+	     -H "Authorization: Bearer $(shell cat $(TEST_AUTH_TOKEN))" \
+		 http://localhost:8080/v1/echo/message \
+		 -d '{ "on": $(shell date +%s), "msg": "hello?" }'
 .PHONY: message
 
 build: ## Compiles the code.

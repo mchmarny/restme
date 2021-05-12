@@ -15,6 +15,10 @@ spec:
       labels:
         app: restme
     spec:
+      volumes:
+      - name: auth-key-volume
+        secret:
+          secretName: auth-key
       containers:
       - name: restme
         image: ko://github.com/mchmarny/restme/cmd
@@ -22,11 +26,17 @@ spec:
         - containerPort: 8080
         env:
         - name: LOG_LEVEL
-          value: debug
+          value: "debug"
         - name: LOG_JSON
           value: "true"
         - name: GIN_MODE
-          value: release
+          value: "release"
+        - name: KEY_FILE
+          value: "/etc/auth-key"
+        volumeMounts:
+        - name: auth-key-volume
+          readOnly: true
+          mountPath: "/etc/auth-key"
 ---
 apiVersion: v1
 kind: Service
