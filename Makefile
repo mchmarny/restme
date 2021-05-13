@@ -22,9 +22,20 @@ lint: ## Lints the entire project
 	golangci-lint -c .golangci.yaml run --timeout=3m
 .PHONY: lint
 
-run: ## Runs uncompiled Go code
+run: ## Runs uncompiled Go service code
 	LOG_LEVEL=debug ADDRESS=":8080" KEY_FILE="test/test.key" go run ./cmd/service/main.go
 .PHONY: run
+
+token: ## Runs uncompiled Go CLI to generate token
+	go run ./cmd/cli/main.go token create --secret test/test.key --issuer test --email demo@domain.com 
+.PHONY: token
+
+cli: ## Compiles the CLI code.
+	CGO_ENABLED=0 \
+	GOFLAGS="-ldflags=-X=main.appVersion=$(RELEASE_VERSION)" \
+		go build -a -mod vendor -o bin/restme-cli ./cmd/cli/
+	bin/restme-cli --help
+.PHONY: cli
 
 verify: ## Runs verification test against the running service
 	AUTH_TOKEN="$(shell cat $(TEST_AUTH_TOKEN))" test/endpoints "http://localhost:8080"
@@ -42,9 +53,9 @@ metrics: ## Collects metrics
 	curl http://localhost:8080/metrics
 .PHONY: metrics
 
-build: ## Compiles the code.
+build: ## Compiles the Service code.
 	CGO_ENABLED=0 go build -a -mod vendor -o bin/rester ./cmd/service/
-	GIN_MODE=release LOG_JSON=true bin/rester
+	GIN_MODE=release LOG_JSON=true bin/restme
 .PHONY: build
 
 upgrade: ## Upgrades all dependancies 
