@@ -60,7 +60,7 @@ func (s *Service) getRequestMetadata(c *gin.Context) gin.H {
 	}
 
 	return gin.H{
-		"id":       id.String(),
+		"id":       id,
 		"time":     time.Now().UTC(),
 		"version":  s.logger.GetAppVersion(),
 		"path":     c.Request.URL.EscapedPath(),

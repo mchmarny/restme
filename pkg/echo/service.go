@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mchmarny/restme/pkg/httputil"
 	"github.com/mchmarny/restme/pkg/log"
+	"github.com/pkg/errors"
 )
 
 // NewService creates a new EchoService instance.
@@ -19,15 +21,13 @@ type Service struct {
 	logger *log.Logger
 }
 
-// MessageHandler handles the inbound messages.
+// MessageHandler responds with the inbound message.
 func (s *Service) MessageHandler(c *gin.Context) {
 	var m Message
 	if err := c.ShouldBindJSON(&m); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		httputil.NewError(c, http.StatusBadRequest, errors.Wrap(err, "Invalid message format"))
 		return
 	}
-
 	s.logger.Debugf("message: %v", m)
-
 	c.IndentedJSON(http.StatusOK, m)
 }

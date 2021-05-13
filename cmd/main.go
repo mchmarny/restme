@@ -9,9 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/penglongli/gin-metrics/ginmetrics"
-
 	"github.com/mchmarny/restme/pkg/auth"
 	"github.com/mchmarny/restme/pkg/config"
 	"github.com/mchmarny/restme/pkg/echo"
@@ -19,6 +16,9 @@ import (
 	"github.com/mchmarny/restme/pkg/log"
 	"github.com/mchmarny/restme/pkg/request"
 	"github.com/mchmarny/restme/pkg/runtime"
+
+	"github.com/gin-gonic/gin"
+	"github.com/penglongli/gin-metrics/ginmetrics"
 )
 
 const (
