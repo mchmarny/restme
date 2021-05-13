@@ -21,7 +21,7 @@ spec:
           secretName: auth-key
       containers:
       - name: restme
-        image: ko://github.com/mchmarny/restme/cmd
+        image: ko://github.com/mchmarny/restme/cmd/service
         ports:
         - containerPort: 8080
         env:

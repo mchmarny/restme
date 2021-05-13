@@ -89,6 +89,7 @@ Request:
 ```shell
 curl -i \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ..." \
   http://localhost:8080/v1/echo \
   -d '{ "on": $(shell date +%s), "msg": "hello?" }'
 ```

@@ -105,4 +105,4 @@ jobs:
       run: |
         KO_DOCKER_REPO=ghcr.io/$GITHUB_REPOSITORY \
         GOFLAGS="-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}" \
-          ko publish ./cmd/ --bare --tags ${{ env.RELEASE_VERSION }},latest
+          ko publish ./cmd/service/ --bare --tags ${{ env.RELEASE_VERSION }},latest

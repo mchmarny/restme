@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.5.2
+RELEASE_VERSION  ?=v0.5.3
 KO_DOCKER_REPO   ?=ghcr.io/mchmarny
 TEST_AUTH_TOKEN  ?=test/test.token
 
@@ -23,7 +23,7 @@ lint: ## Lints the entire project
 .PHONY: lint
 
 run: ## Runs uncompiled Go code
-	LOG_LEVEL=debug ADDRESS=":8080" KEY_FILE="test/test.key" go run ./cmd/main.go
+	LOG_LEVEL=debug ADDRESS=":8080" KEY_FILE="test/test.key" go run ./cmd/service/main.go
 .PHONY: run
 
 verify: ## Runs verification test against the running service
@@ -43,7 +43,7 @@ metrics: ## Collects metrics
 .PHONY: metrics
 
 build: ## Compiles the code.
-	CGO_ENABLED=0 go build -a -mod vendor -o bin/rester ./cmd/
+	CGO_ENABLED=0 go build -a -mod vendor -o bin/rester ./cmd/service/
 	GIN_MODE=release LOG_JSON=true bin/rester
 .PHONY: build
 
@@ -55,7 +55,7 @@ upgrade: ## Upgrades all dependancies
 image: ## Creates container image using ko
 	KO_DOCKER_REPO=$(KO_DOCKER_REPO)/$(SERVICE_NAME) \
 	GOFLAGS="-ldflags=-X=main.version=$(RELEASE_VERSION)" \
-		ko publish ./cmd/ --bare --tags $(RELEASE_VERSION),latest
+		ko publish ./cmd/service/ --bare --tags $(RELEASE_VERSION),latest
 .PHONY: tag
 
 tag: ## Creates release tag 
