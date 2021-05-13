@@ -47,21 +47,13 @@ func (a *TokenAuthenticator) Authenticate() gin.HandlerFunc {
 		tokenParts := strings.Split(tokenHeader, " ")
 		if len(tokenParts) != expectedTokenParts {
 			a.logger.Errorf("invalid token format '%s'", tokenHeader)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": "Invalid token format",
-				"status":  "Unauthorized",
-			})
-			c.Abort()
+			makeAuthError(c, "Invalid token format")
 			return
 		}
 
 		tokenVal := tokenParts[1]
 		if tokenVal == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": "User not authenticated",
-				"status":  "Unauthorized",
-			})
-			c.Abort()
+			makeAuthError(c, "User not authenticated")
 			return
 		}
 
@@ -69,22 +61,14 @@ func (a *TokenAuthenticator) Authenticate() gin.HandlerFunc {
 		token, err := ParseJWT(a.key, tokenVal)
 		if err != nil {
 			a.logger.Errorf("error parsing token '%s': %v", tokenVal, err)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": "Token parsing error",
-				"status":  "Unauthorized",
-			})
-			c.Abort()
+			makeAuthError(c, "Token parsing error")
 			return
 		}
 
 		// validate token
 		if (token.Valid() != nil) || (!token.VerifyExpiresAt(time.Now().Unix(), true)) {
 			a.logger.Errorf("token invalid or expired '%+v'", token)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": "Invalid token",
-				"status":  "Unauthorized",
-			})
-			c.Abort()
+			makeAuthError(c, "Invalid token")
 			return
 		}
 
@@ -94,4 +78,12 @@ func (a *TokenAuthenticator) Authenticate() gin.HandlerFunc {
 
 		c.Next()
 	}
+}
+
+func makeAuthError(c *gin.Context, msg string) {
+	c.JSON(http.StatusUnauthorized, gin.H{
+		"message": msg,
+		"status":  "Unauthorized",
+	})
+	c.Abort()
 }

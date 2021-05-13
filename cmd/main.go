@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/penglongli/gin-metrics/ginmetrics"
+
 	"github.com/mchmarny/restme/pkg/auth"
 	"github.com/mchmarny/restme/pkg/config"
 	"github.com/mchmarny/restme/pkg/echo"
@@ -37,6 +39,10 @@ func makeRouter(authenticator *auth.TokenAuthenticator, logger *log.Logger) *gin
 	gin.ForceConsoleColor()
 
 	r := gin.New()
+
+	m := ginmetrics.GetMonitor()
+	m.SetMetricPath("/metrics")
+	m.Use(r)
 
 	r.Use(gin.Recovery())
 	r.Use(gin.Logger())
@@ -70,6 +76,19 @@ func makeRouter(authenticator *auth.TokenAuthenticator, logger *log.Logger) *gin
 		}
 	}
 
+	// collect routes for index
+	routes := []string{}
+	routeInfo := r.Routes()
+	for _, info := range routeInfo {
+		routes = append(routes, fmt.Sprintf("%-7s %s", info.Method, info.Path))
+	}
+
+	r.GET("/", func(c *gin.Context) {
+		c.IndentedJSON(http.StatusOK, gin.H{
+			"routes": routes,
+		})
+	})
+
 	return r
 }
 
@@ -97,18 +116,6 @@ func main() {
 
 	r := makeRouter(a, logger)
 
-	routes := []string{}
-	routeInfo := r.Routes()
-	for _, info := range routeInfo {
-		routes = append(routes, fmt.Sprintf("%-7s %s", info.Method, info.Path))
-	}
-
-	r.GET("/", func(c *gin.Context) {
-		c.IndentedJSON(http.StatusOK, gin.H{
-			"routes": routes,
-		})
-	})
-
 	s := &http.Server{
 		Addr:           address,
 		Handler:        r,
@@ -122,10 +129,10 @@ func main() {
 
 	go func() {
 		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Fatalf("error: %s\n", err)
+			logger.Fatalf("server error: %s\n", err)
 		}
 	}()
-	logger.Info("server started")
+	logger.Infof("app server started at %s", address)
 
 	<-done
 	logger.Info("server stopped")

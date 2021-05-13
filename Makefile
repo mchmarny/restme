@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.4.5
+RELEASE_VERSION  ?=v0.5.1
 KO_DOCKER_REPO   ?=ghcr.io/mchmarny
 TEST_AUTH_TOKEN  ?=test/test.token
 
@@ -37,6 +37,10 @@ message: ## Invokes echo service
 		 http://localhost:8080/v1/echo/message \
 		 -d '{ "on": $(shell date +%s), "msg": "hello?" }'
 .PHONY: message
+
+metrics: ## Collects metrics 
+	curl http://localhost:8080/metrics
+.PHONY: metrics
 
 build: ## Compiles the code.
 	CGO_ENABLED=0 go build -a -mod vendor -o bin/rester ./cmd/
