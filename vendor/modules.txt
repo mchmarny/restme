@@ -43,7 +43,7 @@ github.com/golang/protobuf/ptypes/timestamp
 # github.com/google/uuid v1.2.0
 ## explicit
 github.com/google/uuid
-# github.com/jaypipes/ghw v0.7.0
+# github.com/jaypipes/ghw v0.8.0
 ## explicit
 github.com/jaypipes/ghw
 github.com/jaypipes/ghw/pkg/baseboard
@@ -60,6 +60,7 @@ github.com/jaypipes/ghw/pkg/memory
 github.com/jaypipes/ghw/pkg/net
 github.com/jaypipes/ghw/pkg/option
 github.com/jaypipes/ghw/pkg/pci
+github.com/jaypipes/ghw/pkg/pci/address
 github.com/jaypipes/ghw/pkg/product
 github.com/jaypipes/ghw/pkg/snapshot
 github.com/jaypipes/ghw/pkg/topology

@@ -97,8 +97,8 @@ leftovers.
 The rest of the environment variables are relevant iff `GHW_SNAPSHOT_PATH` is given.
 `GHW_SNAPSHOT_ROOT` let users specify the directory
 on which the snapshot should be unpacked. This moves the ownership of that
-directory from `ghw` to users. `ghw` will still clean up the unpacked snapshot
-when no longer needed.
+directory from `ghw` to users. For this reason, `ghw` will *not* clean up automatically
+the content unpacked in `GHW_SNAPSHOT_ROOT`.
 
 `GHW_SNAPSHOT_EXCLUSIVE` is relevant iff `GHW_SNAPSHOT_ROOT` is given.
 Set it to any value to toggle it on. This tells `ghw` that the directory is meant
@@ -493,6 +493,8 @@ Each `ghw.Partition` struct contains these fields:
 * `ghw.Partition.Disk` is a pointer to the `ghw.Disk` object associated with
   the partition. This will be `nil` if the `ghw.Partition` struct was returned
   by the `ghw.DiskPartitions()` library function.
+* `ghw.Partition.UUID` is a string containing the volume UUID on Linux, the
+  partition UUID on MacOS and nothing on Windows.
 
 ```go
 package main
@@ -653,6 +655,9 @@ Each `ghw.NIC` struct contains the following fields:
 * `ghw.NIC.Capabilities` is an array of pointers to `ghw.NICCapability` structs
   that can describe the things the NIC supports. These capabilities match the
   returned values from the `ethtool -k <DEVICE>` call on Linux
+* `ghw.NIC.PCIAddress` is the PCI device address of the device backing the NIC.
+  this is not-nil only if the backing device is indeed a PCI device; more backing
+  devices (e.g. USB) will be added in future versions.
 
 The `ghw.NICCapability` struct contains the following fields:
 
@@ -803,6 +808,11 @@ The `ghw.PCIDevice` struct has the following fields:
 * `ghw.PCIDevice.ProgrammingInterface` is a pointer to a
   `pcidb.ProgrammingInterface` struct that describes the device subclass'
   programming interface. This will always be non-nil.
+
+The `ghw.PCIAddress` (which is an alias for the `ghw.pci.address.Address`
+struct) contains the PCI address fields. It has a `ghw.PCIAddress.String()`
+method that returns the canonical Domain:Bus:Slot.Function ([D]BSF)
+representation of this Address
 
 #### Finding a PCI device by PCI address
 
@@ -1136,6 +1146,8 @@ The `ghw.BaseboardInfo` struct contains multiple fields:
 * `ghw.BaseboardInfo.AssetTag` is a string with the baseboard asset tag
 * `ghw.BaseboardInfo.SerialNumber` is a string with the baseboard serial number
 * `ghw.BaseboardInfo.Vendor` is a string with the baseboard vendor
+* `ghw.BaseboardInfo.Product` is a string with the baseboard name on Linux and
+  Product on Windows
 * `ghw.BaseboardInfo.Version` is a string with the baseboard version
 
 **NOTE**: These fields are often missing for non-server hardware. Don't be
@@ -1274,6 +1286,18 @@ memory:
   total_physical_bytes: 25263415296
   total_usable_bytes: 25263415296
 ```
+
+## Calling external programs
+
+By default ghw may call external programs, for example `ethtool`, to learn about hardware capabilities.
+In some rare circumstances it may be useful to opt out from this behaviour and rely only on the data
+provided by pseudo-filesystems, like sysfs.
+The most common use case is when we want to consume a snapshot from ghw. In these cases the information
+provided by tools will be most likely inconsistent with the data from the snapshot - they will run on
+a different host!
+To prevent ghw from calling external tools, set the environs variable `GHW_DISABLE_TOOLS` to any value,
+or, programmatically, check the `WithDisableTools` function.
+The default behaviour of ghw is to call external tools when available.
 
 ## Developers
 
