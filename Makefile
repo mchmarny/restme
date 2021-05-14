@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.5.3
+RELEASE_VERSION  ?=v0.5.4
 KO_DOCKER_REPO   ?=ghcr.io/mchmarny
 TEST_AUTH_TOKEN  ?=test/test.token
 
@@ -34,20 +34,12 @@ cli: ## Compiles the CLI code.
 .PHONY: cli
 
 token: ## Runs uncompiled Go CLI to generate token
-	bin/restme-cli token create --secret test/test.key --issuer test --email demo@domain.com 
+	bin/restme-cli token create \
+		--secret test/test.key \
+		--issuer test \
+		--email demo@domain.com \
+		--ttl "30s"
 .PHONY: token
-
-message: ## Invokes echo service 
-	bin/restme-cli echo message --content "hello there" 
-.PHONY: message
-
-request: ## Invokes request service 
-	bin/restme-cli invoke request 
-.PHONY: request
-
-runtime: ## Invokes runtime service 
-	bin/restme-cli invoke runtime 
-.PHONY: runtime
 
 verify: ## Runs verification test against the running service
 	AUTH_TOKEN="$(shell cat $(TEST_AUTH_TOKEN))" test/endpoints "http://localhost:8080"

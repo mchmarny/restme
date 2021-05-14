@@ -66,9 +66,20 @@ func sendMessage(c *cli.Context) error {
 	buf := bytes.NewBuffer(content)
 
 	url := fmt.Sprintf("%s/v1/echo/message", address)
-	if _, err := httpInvoke(url, http.MethodPost, buf); err != nil {
+	result, err := httpInvoke(url, http.MethodPost, buf)
+	if err != nil {
 		return errors.Wrapf(err, "error invoking %s", address)
 	}
+
+	var m2 echo.Message
+	if err := json.Unmarshal(result, &m2); err != nil {
+		return errors.Wrapf(err, "error parsing result message %s", string(result))
+	}
+
+	fmt.Println("\nSent:")
+	fmt.Println(m.String())
+	fmt.Println("\nReceived:")
+	fmt.Println(m2.String())
 
 	return nil
 }

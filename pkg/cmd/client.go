@@ -49,7 +49,5 @@ func httpInvoke(address, method string, content io.Reader) ([]byte, error) {
 		return nil, errors.Wrapf(err, "error parsing body %s", string(body))
 	}
 
-	fmt.Println(string(body))
-
 	return body, nil
 }

@@ -32,6 +32,13 @@ jobs:
       with:
         files: .golangci.yaml
 
+    - name: Lint Code
+      if: steps.golangci_config.outputs.files_exists == 'true'
+      uses: golangci/golangci-lint-action@v2
+      with:
+        version: v1.40
+        args: --timeout 3m
+
     - name: Lint Code 
       if: steps.golangci_config.outputs.files_exists == 'true'
       uses: golangci/golangci-lint-action@v2

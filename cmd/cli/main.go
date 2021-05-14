@@ -39,8 +39,9 @@ func main() {
 				Name:  "invoke",
 				Usage: fmt.Sprintf("%s service invoke", appName),
 				Subcommands: []*cli.Command{
-					cmd.MakeRequestCmd(appName),
-					cmd.MakeRuntimeCmd(appName),
+					cmd.MakeInvokeCmd(appName, "request", "/v1/request/info"),
+					cmd.MakeInvokeCmd(appName, "runtime", "/v1/runtime/info"),
+					cmd.MakeLoadCmd(appName),
 				},
 			},
 		},
