@@ -26,10 +26,6 @@ run: ## Runs uncompiled Go service code
 	LOG_LEVEL=debug ADDRESS=":8080" KEY_FILE="test/test.key" go run ./cmd/service/main.go
 .PHONY: run
 
-token: ## Runs uncompiled Go CLI to generate token
-	go run ./cmd/cli/main.go token create --secret test/test.key --issuer test --email demo@domain.com 
-.PHONY: token
-
 cli: ## Compiles the CLI code.
 	CGO_ENABLED=0 \
 	GOFLAGS="-ldflags=-X=main.appVersion=$(RELEASE_VERSION)" \
@@ -37,11 +33,27 @@ cli: ## Compiles the CLI code.
 	bin/restme-cli --help
 .PHONY: cli
 
+token: ## Runs uncompiled Go CLI to generate token
+	bin/restme-cli token create --secret test/test.key --issuer test --email demo@domain.com 
+.PHONY: token
+
+message: ## Invokes echo service 
+	bin/restme-cli echo message --content "hello there" 
+.PHONY: message
+
+request: ## Invokes request service 
+	bin/restme-cli invoke request 
+.PHONY: request
+
+runtime: ## Invokes runtime service 
+	bin/restme-cli invoke runtime 
+.PHONY: runtime
+
 verify: ## Runs verification test against the running service
 	AUTH_TOKEN="$(shell cat $(TEST_AUTH_TOKEN))" test/endpoints "http://localhost:8080"
 .PHONY: verify
 
-message: ## Invokes echo service 
+curl-message: ## Invokes echo service 
 	curl -i \
 	     -H "Content-Type: application/json" \
 	     -H "Authorization: Bearer $(shell cat $(TEST_AUTH_TOKEN))" \

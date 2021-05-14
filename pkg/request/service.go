@@ -41,6 +41,9 @@ func (s *Service) RequestHandler(c *gin.Context) {
 	// headers
 	for name, headers := range c.Request.Header {
 		name = strings.ToLower(name)
+		if name == "authorization" {
+			continue
+		}
 		for i, h := range headers {
 			if len(headers) > 1 {
 				result.Headers[fmt.Sprintf("%s[%d]", name, i)] = h

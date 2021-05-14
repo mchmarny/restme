@@ -2,11 +2,10 @@ package auth
 
 import (
 	"io/ioutil"
-	"os"
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/mchmarny/restme/pkg/fileutil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,21 +15,8 @@ const (
 	testKeyContent  = "test-key-content"
 )
 
-func writeFile(path, content string) error {
-	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
-	if err != nil {
-		return errors.Wrapf(err, "error creating file: %s", path)
-	}
-	defer f.Close()
-
-	if _, err := f.WriteString(content); err != nil {
-		return err
-	}
-	return nil
-}
-
 func createTestKeyFile() error {
-	return writeFile(testKeyPath, testKeyContent)
+	return fileutil.WriteFile(testKeyPath, testKeyContent)
 }
 
 func TestToken(t *testing.T) {
@@ -59,7 +45,7 @@ func TestToken(t *testing.T) {
 	assert.Nil(t, token.Valid())
 	assert.True(t, token.VerifyExpiresAt(time.Now().Unix(), true))
 
-	if err := writeFile(testAuthTknPath, tokenStr); err != nil {
+	if err := fileutil.WriteFile(testAuthTknPath, tokenStr); err != nil {
 		t.Fatalf("error writing JWT token to %s: %v", testAuthTknPath, err)
 	}
 }
