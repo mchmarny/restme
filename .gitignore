@@ -11,5 +11,5 @@
 bin
 
 # Keys
-test.key
+*.key
 test.token
