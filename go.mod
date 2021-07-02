@@ -16,7 +16,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/penglongli/gin-metrics v0.1.1
 	github.com/pkg/errors v0.9.1
-	github.com/shirou/gopsutil v3.21.4+incompatible
+	github.com/shirou/gopsutil v3.21.6+incompatible
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
