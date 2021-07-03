@@ -15,6 +15,8 @@ const (
 	limitMemResourceFile       = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
 	limitCPUPeriodResourceFile = "/sys/fs/cgroup/cpu/cpu.cfs_period_us"
 	limitCPUQuotaResourceFile  = "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
+
+	bitSizeDefault = 64
 )
 
 // GetLimits retreaves limits based on cgroups
@@ -61,7 +63,7 @@ func getCGroupsFile(path string) (val float64, wr bool, info string) {
 
 	cs := strings.Trim(string(bc), "\n")
 
-	ic, err := strconv.ParseFloat(cs, 64)
+	ic, err := strconv.ParseFloat(cs, bitSizeDefault)
 	if err != nil {
 		return 0, false, fmt.Sprintf("non-numeric value: %s - %v", cs, err)
 	}

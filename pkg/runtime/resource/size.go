@@ -49,7 +49,7 @@ func byteSize(bytes uint64) string {
 		return "0"
 	}
 
-	result := strconv.FormatFloat(value, 'f', 1, 64)
+	result := strconv.FormatFloat(value, 'f', 1, bitSizeDefault)
 	result = strings.TrimSuffix(result, ".0")
 	return result + unit
 }
