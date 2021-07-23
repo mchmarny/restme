@@ -80,9 +80,6 @@ func (m *Monitor) SetDuration(duration []float64) {
 
 // AddMetric add custom monitor metric.
 func (m *Monitor) AddMetric(metric *Metric) error {
-        if m.metrics == nil {
-		m.metrics = make(map[string]*Metric)
-	}
 	if _, ok := m.metrics[metric.Name]; ok {
 		return errors.Errorf("metric '%s' is existed", metric.Name)
 	}
