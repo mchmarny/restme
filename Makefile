@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.5.8
+RELEASE_VERSION  ?=v0.5.9
 KO_DOCKER_REPO   ?=ghcr.io/mchmarny
 TEST_AUTH_TOKEN  ?=test/test.token
 
