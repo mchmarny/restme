@@ -14,7 +14,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v2
       with:
-        go-version: ^1.16
+        go-version: ^1.17
 
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -106,3 +106,8 @@ jobs:
         KO_DOCKER_REPO=ghcr.io/$GITHUB_REPOSITORY \
         GOFLAGS="-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}" \
           ko publish ./cmd/service/ --bare --tags ${{ env.RELEASE_VERSION }},latest
+
+    - name: Sign Image 
+      uses: sigstore/cosign-installer@main
+      with:
+        cosign-release: 'v1.0.0'
