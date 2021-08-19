@@ -111,3 +111,6 @@ jobs:
       uses: sigstore/cosign-installer@main
       with:
         cosign-release: 'v1.0.0'
+    
+    - name: Check Cosign
+      run: cosign version
