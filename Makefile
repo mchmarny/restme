@@ -1,6 +1,6 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.5.9
-KO_DOCKER_REPO   ?=ghcr.io/mchmarny
+RELEASE_VERSION  ?=v0.5.11
+KO_DOCKER_REPO   ?=gcr.io/cloudy-lab
 TEST_AUTH_TOKEN  ?=test/test.token
 
 all: help
@@ -71,6 +71,13 @@ image: ## Creates container image using ko
 	KO_DOCKER_REPO=$(KO_DOCKER_REPO)/$(SERVICE_NAME) \
 	GOFLAGS="-ldflags=-X=main.version=$(RELEASE_VERSION)" \
 		ko publish ./cmd/service/ --bare --tags $(RELEASE_VERSION),latest
+	COSIGN_PASSWORD="" cosign sign \
+		-key cosign.key \
+		-a tag=$(RELEASE_VERSION) \
+		$(KO_DOCKER_REPO)/$(SERVICE_NAME)
+	COSIGN_PASSWORD="" cosign verify \
+		-key cosign.pub \
+		$(KO_DOCKER_REPO)/$(SERVICE_NAME)
 .PHONY: tag
 
 tag: ## Creates release tag 

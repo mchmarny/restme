@@ -13,3 +13,4 @@ bin
 # Keys
 *.key
 test.token
+cosign.*
