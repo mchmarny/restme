@@ -2,12 +2,17 @@ SERVICE_NAME     ?=restme
 RELEASE_VERSION  ?=v0.5.11
 KO_DOCKER_REPO   ?=gcr.io/cloudy-lab
 TEST_AUTH_TOKEN  ?=test/test.token
+SERVICE_URL      :=$(shell gcloud run services describe restme --region us-west1 --format='value(status.url)')
 
 all: help
 
 version: ## Outputs current verison
 	@echo $(RELEASE_VERSION)
 .PHONY: version
+
+url: ## Outputs service url
+	@echo $(SERVICE_URL)
+.PHONY: url
 
 tidy: ## Updates the go modules and vendors all dependancies 
 	go mod tidy
@@ -45,16 +50,37 @@ verify: ## Runs verification test against the running service
 	AUTH_TOKEN="$(shell cat $(TEST_AUTH_TOKEN))" test/endpoints "http://localhost:8080"
 .PHONY: verify
 
-curl-message: ## Invokes echo service 
+message: ## Invokes echo service 
 	curl -i \
 	     -H "Content-Type: application/json" \
 	     -H "Authorization: Bearer $(shell cat $(TEST_AUTH_TOKEN))" \
-		 http://localhost:8080/v1/echo/message \
+		 $(SERVICE_URL)/v1/echo/message \
 		 -d '{ "on": $(shell date +%s), "msg": "hello?" }'
 .PHONY: message
 
+request: ## Invokes request service 
+	curl -i \
+	     -H "Content-Type: application/json" \
+	     -H "Authorization: Bearer $(shell cat $(TEST_AUTH_TOKEN))" \
+		 $(SERVICE_URL)/v1/request/info
+.PHONY: request
+
+runtime: ## Invokes requesruntimet service 
+	curl -i \
+	     -H "Content-Type: application/json" \
+	     -H "Authorization: Bearer $(shell cat $(TEST_AUTH_TOKEN))" \
+		 $(SERVICE_URL)/v1/runtime/info
+.PHONY: runtime
+
+load: ## Invokes load service 
+	curl -i \
+	     -H "Content-Type: application/json" \
+	     -H "Authorization: Bearer $(shell cat $(TEST_AUTH_TOKEN))" \
+		 $(SERVICE_URL)/v1/load/cpu/30s
+.PHONY: load
+
 metrics: ## Collects metrics 
-	curl http://localhost:8080/metrics
+	curl $(SERVICE_URL)/metrics
 .PHONY: metrics
 
 build: ## Compiles the Service code.
