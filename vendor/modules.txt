@@ -80,7 +80,7 @@ github.com/mitchellh/go-homedir
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
-# github.com/penglongli/gin-metrics v0.1.4
+# github.com/penglongli/gin-metrics v0.1.7
 ## explicit
 github.com/penglongli/gin-metrics/bloom
 github.com/penglongli/gin-metrics/ginmetrics
