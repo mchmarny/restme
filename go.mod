@@ -7,7 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.7.4
 	github.com/google/uuid v1.3.0
 	github.com/jaypipes/ghw v0.8.0
-	github.com/penglongli/gin-metrics v0.1.4
+	github.com/penglongli/gin-metrics v0.1.8
 	github.com/pkg/errors v0.9.1
 	github.com/shirou/gopsutil v3.21.7+incompatible
 	github.com/sirupsen/logrus v1.8.1
