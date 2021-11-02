@@ -9,7 +9,7 @@ require (
 	github.com/jaypipes/ghw v0.8.0
 	github.com/penglongli/gin-metrics v0.1.4
 	github.com/pkg/errors v0.9.1
-	github.com/shirou/gopsutil v3.21.7+incompatible
+	github.com/shirou/gopsutil v3.21.10+incompatible
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tklauser/go-sysconf v0.3.7 // indirect
