@@ -22,7 +22,7 @@ github.com/gin-gonic/gin/binding
 github.com/gin-gonic/gin/internal/bytesconv
 github.com/gin-gonic/gin/internal/json
 github.com/gin-gonic/gin/render
-# github.com/go-ole/go-ole v1.2.4
+# github.com/go-ole/go-ole v1.2.6
 github.com/go-ole/go-ole
 github.com/go-ole/go-ole/oleutil
 # github.com/go-playground/locales v0.13.0
@@ -105,7 +105,7 @@ github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
 # github.com/russross/blackfriday/v2 v2.0.1
 github.com/russross/blackfriday/v2
-# github.com/shirou/gopsutil v3.21.7+incompatible
+# github.com/shirou/gopsutil v3.21.11+incompatible
 ## explicit
 github.com/shirou/gopsutil/cpu
 github.com/shirou/gopsutil/host
@@ -133,6 +133,9 @@ github.com/ugorji/go/codec
 github.com/urfave/cli/v2
 # github.com/willf/bitset v1.1.11
 github.com/willf/bitset
+# github.com/yusufpapurcu/wmi v1.2.2
+## explicit
+github.com/yusufpapurcu/wmi
 # golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 golang.org/x/crypto/sha3
 # golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c

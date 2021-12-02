@@ -9,10 +9,11 @@ require (
 	github.com/jaypipes/ghw v0.8.0
 	github.com/penglongli/gin-metrics v0.1.4
 	github.com/pkg/errors v0.9.1
-	github.com/shirou/gopsutil v3.21.7+incompatible
+	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tklauser/go-sysconf v0.3.7 // indirect
 	github.com/urfave/cli/v2 v2.3.0
+	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c
 )
