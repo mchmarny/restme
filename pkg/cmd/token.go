@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"os/user"
 	"path"
 
@@ -67,7 +67,7 @@ func createToken(c *cli.Context) error {
 		return cli.Exit("ttl required", 1)
 	}
 
-	secret, err := ioutil.ReadFile(secretPath)
+	secret, err := os.ReadFile(secretPath)
 	if err != nil {
 		return cli.Exit("error reading secret", 1)
 	}

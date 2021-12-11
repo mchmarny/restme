@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -24,7 +24,7 @@ func TestToken(t *testing.T) {
 		t.Fatalf("error creating test key: %v", err)
 	}
 
-	testSecret, err := ioutil.ReadFile(testKeyPath)
+	testSecret, err := os.ReadFile(testKeyPath)
 	if err != nil {
 		t.Fatalf("error reading test key %s: %v", testKeyPath, err)
 	}

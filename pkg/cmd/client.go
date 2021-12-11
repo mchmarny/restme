@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/pkg/errors"
@@ -20,7 +20,7 @@ func httpInvoke(address, method string, content io.Reader) ([]byte, error) {
 		return nil, errors.Wrapf(err, "error saving JWT: %v", err)
 	}
 
-	token, err := ioutil.ReadFile(tokePath)
+	token, err := os.ReadFile(tokePath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error reading test key %s: %v", tokePath, err)
 	}
@@ -44,7 +44,7 @@ func httpInvoke(address, method string, content io.Reader) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error parsing body %s", string(body))
 	}

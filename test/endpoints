@@ -30,8 +30,6 @@ EOF
 main() {
     printf "Invoking '${URL}' GET endpoints...\n"
     test_get_endpoint "${URL}/v1/request/info"
-    test_get_endpoint "${URL}/v1/runtime/info"
-    test_get_endpoint "${URL}/v1/load/cpu/2s"
 
     printf "Invoking '${URL}' POST endpoints...\n"
     test_echo_post "${URL}/v1/echo/message"

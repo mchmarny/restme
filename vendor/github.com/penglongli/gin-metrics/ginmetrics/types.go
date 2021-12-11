@@ -78,6 +78,26 @@ func (m *Monitor) SetDuration(duration []float64) {
 	m.reqDuration = duration
 }
 
+func (m *Monitor) SetMetricPrefix(prefix string) {
+	metricRequestTotal = prefix + metricRequestTotal
+	metricRequestUVTotal = prefix + metricRequestUVTotal
+	metricURIRequestTotal = prefix + metricURIRequestTotal
+	metricRequestBody = prefix + metricRequestBody
+	metricResponseBody = prefix + metricResponseBody
+	metricRequestDuration = prefix + metricRequestDuration
+	metricSlowRequest = prefix + metricSlowRequest
+}
+
+func (m *Monitor) SetMetricSuffix(suffix string) {
+	metricRequestTotal += suffix
+	metricRequestUVTotal += suffix
+	metricURIRequestTotal += suffix
+	metricRequestBody += suffix
+	metricResponseBody += suffix
+	metricRequestDuration += suffix
+	metricSlowRequest += suffix
+}
+
 // AddMetric add custom monitor metric.
 func (m *Monitor) AddMetric(metric *Metric) error {
 	if _, ok := m.metrics[metric.Name]; ok {

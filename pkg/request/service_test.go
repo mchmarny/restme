@@ -18,7 +18,7 @@ func TestRequestHandler(t *testing.T) {
 	r.GET("/", s.RequestHandler)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/", http.NoBody)
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)

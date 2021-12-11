@@ -12,10 +12,8 @@ import (
 	"github.com/mchmarny/restme/pkg/auth"
 	"github.com/mchmarny/restme/pkg/config"
 	"github.com/mchmarny/restme/pkg/echo"
-	"github.com/mchmarny/restme/pkg/load"
 	"github.com/mchmarny/restme/pkg/log"
 	"github.com/mchmarny/restme/pkg/request"
-	"github.com/mchmarny/restme/pkg/runtime"
 
 	"github.com/gin-gonic/gin"
 	"github.com/penglongli/gin-metrics/ginmetrics"
@@ -60,19 +58,6 @@ func makeRouter(authenticator *auth.TokenAuthenticator, logger *log.Logger) *gin
 		{
 			reqService := request.NewService(logger)
 			reqGroup.GET("/info", reqService.RequestHandler)
-		}
-
-		runtimeGroup := v1.Group("/runtime")
-		{
-			resourceService := runtime.NewService(logger)
-			runtimeGroup.GET("/info", resourceService.ResourceHandler)
-		}
-
-		loadGroup := v1.Group("/load")
-		{
-			loadService := load.NewService(logger)
-			cpuLoadGroup := loadGroup.Group("/cpu")
-			cpuLoadGroup.GET("/:duration", loadService.CPULoadHandler)
 		}
 	}
 

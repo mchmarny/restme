@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"io/ioutil"
+	"os"
 	"regexp"
 	"time"
 
@@ -80,7 +80,7 @@ func getKey(path string) ([]byte, error) {
 	if path == "" {
 		return nil, errors.New("path required")
 	}
-	b, err := ioutil.ReadFile(path)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error reading key file: %s", path)
 	}

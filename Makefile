@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.5.11
+RELEASE_VERSION  ?=v0.6.3
 KO_DOCKER_REPO   ?=gcr.io/cloudy-lab
 TEST_AUTH_TOKEN  ?=test/test.token
 SERVICE_URL      :=$(shell gcloud run services describe restme --region us-west1 --format='value(status.url)')
@@ -65,20 +65,6 @@ request: ## Invokes request service
 		 $(SERVICE_URL)/v1/request/info
 .PHONY: request
 
-runtime: ## Invokes requesruntimet service 
-	curl -i \
-	     -H "Content-Type: application/json" \
-	     -H "Authorization: Bearer $(shell cat $(TEST_AUTH_TOKEN))" \
-		 $(SERVICE_URL)/v1/runtime/info
-.PHONY: runtime
-
-load: ## Invokes load service 
-	curl -i \
-	     -H "Content-Type: application/json" \
-	     -H "Authorization: Bearer $(shell cat $(TEST_AUTH_TOKEN))" \
-		 $(SERVICE_URL)/v1/load/cpu/30s
-.PHONY: load
-
 metrics: ## Collects metrics 
 	curl $(SERVICE_URL)/metrics
 .PHONY: metrics
@@ -98,11 +84,11 @@ image: ## Creates container image using ko
 	GOFLAGS="-ldflags=-X=main.version=$(RELEASE_VERSION)" \
 		ko publish ./cmd/service/ --bare --tags $(RELEASE_VERSION),latest
 	COSIGN_PASSWORD="" cosign sign \
-		-key cosign.key \
+		--key cosign.key \
 		-a tag=$(RELEASE_VERSION) \
 		$(KO_DOCKER_REPO)/$(SERVICE_NAME)
 	COSIGN_PASSWORD="" cosign verify \
-		-key cosign.pub \
+		--key cosign.pub \
 		$(KO_DOCKER_REPO)/$(SERVICE_NAME)
 .PHONY: tag
 

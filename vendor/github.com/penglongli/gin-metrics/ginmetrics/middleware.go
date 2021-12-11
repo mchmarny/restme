@@ -13,7 +13,7 @@ import (
 
 var (
 	metricRequestTotal    = "gin_request_total"
-	metricRequestUV       = "gin_request_uv"
+	metricRequestUVTotal  = "gin_request_uv_total"
 	metricURIRequestTotal = "gin_uri_request_total"
 	metricRequestBody     = "gin_request_body_total"
 	metricResponseBody    = "gin_response_body_total"
@@ -33,6 +33,23 @@ func (m *Monitor) Use(r gin.IRoutes) {
 	})
 }
 
+// UseWithoutExposingEndpoint is used to add monitor interceptor to gin router
+// It can be called multiple times to intercept from multiple gin.IRoutes
+// http path is not set, to do that use Expose function
+func (m *Monitor) UseWithoutExposingEndpoint(r gin.IRoutes) {
+	m.initGinMetrics()
+	r.Use(m.monitorInterceptor)
+}
+
+// Expose adds metric path to a given router.
+// The router can be different with the one passed to UseWithoutExposingEndpoint.
+// This allows to expose metrics on different port.
+func (m *Monitor) Expose(r gin.IRoutes) {
+	r.GET(m.metricPath, func(ctx *gin.Context) {
+		promhttp.Handler().ServeHTTP(ctx.Writer, ctx.Request)
+	})
+}
+
 // initGinMetrics used to init gin metrics
 func (m *Monitor) initGinMetrics() {
 	bloomFilter = bloom.NewBloomFilter()
@@ -45,7 +62,7 @@ func (m *Monitor) initGinMetrics() {
 	})
 	_ = monitor.AddMetric(&Metric{
 		Type:        Counter,
-		Name:        metricRequestUV,
+		Name:        metricRequestUVTotal,
 		Description: "all the server received ip num.",
 		Labels:      nil,
 	})
@@ -107,7 +124,7 @@ func (m *Monitor) ginMetricHandle(ctx *gin.Context, start time.Time) {
 	// set uv
 	if clientIP := ctx.ClientIP(); !bloomFilter.Contains(clientIP) {
 		bloomFilter.Add(clientIP)
-		_ = m.GetMetric(metricRequestUV).Inc(nil)
+		_ = m.GetMetric(metricRequestUVTotal).Inc(nil)
 	}
 
 	// set uri request total
