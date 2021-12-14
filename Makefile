@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.6.3
+RELEASE_VERSION  ?=v0.6.4
 KO_DOCKER_REPO   ?=gcr.io/cloudy-lab
 TEST_AUTH_TOKEN  ?=test/test.token
 SERVICE_URL      :=$(shell gcloud run services describe restme --region us-west1 --format='value(status.url)')
