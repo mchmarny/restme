@@ -33,7 +33,7 @@ jobs:
       if: steps.golangci_config.outputs.files_exists == 'true'
       uses: golangci/golangci-lint-action@v2
       with:
-        version: v1.40
+        version: latest
         args: --timeout 3m
 
     - name: Test Code
@@ -101,16 +101,29 @@ jobs:
         AUTH_TOKEN="${TOKEN}" test/endpoints "${SERVICE_URL}"
         AUTH_TOKEN="${TOKEN}" test/version "${SERVICE_URL}" "${{ env.RELEASE_VERSION }}"
 
-    - name: Publish Image
-      run: |
-        KO_DOCKER_REPO=ghcr.io/$GITHUB_REPOSITORY \
-        GOFLAGS="-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}" \
-          ko publish ./cmd/service/ --bare --tags ${{ env.RELEASE_VERSION }},latest
 
-    - name: Sign Image 
-      uses: sigstore/cosign-installer@main
+    - id: Auth to GCP
+      uses: google-github-actions/auth@v0.4.0
       with:
-        cosign-release: 'v1.0.0'
+        workload_identity_provider: 'projects/756793645202/locations/global/workloadIdentityPools/restme-pool/providers/restme-provider'
+        service_account: 'restme-sa@cloudy-lab.iam.gserviceaccount.com'
+
+    - name: Deploy to Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v0.6.0
+      with:
+        image: gcr.io/cloudy-lab/restme
+        service: hello-cloud-run
+
+    # - name: Publish Image
+    #   run: |
+    #     KO_DOCKER_REPO=ghcr.io/$GITHUB_REPOSITORY \
+    #     GOFLAGS="-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}" \
+    #       ko publish ./cmd/service/ --bare --tags ${{ env.RELEASE_VERSION }},latest
+
+    # - name: Sign Image 
+    #   uses: sigstore/cosign-installer@main
+    #   with:
+    #     cosign-release: 'v1.0.0'
     
-    - name: Check Cosign
-      run: cosign version
+    # - name: Check Cosign
+    #   run: cosign version

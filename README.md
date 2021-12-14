@@ -36,52 +36,6 @@ Collection of REST services
 }
 ```
 
-### /v1/resource
-
-```json
-{
-  "host": {
-      "hostname": "restme-86888bf66-9khgb",
-      "os": "linux",
-      ...
-  },
-  "resources": {
-      "ram": {
-          "value": "6.8G",
-          "context": "Source: OS process status, Size: 6.8G"
-      },
-      "cpu": {
-          "value": 2,
-          "context": "Source: OS process status"
-      }
-  },
-  "limits": {
-      "ram": {
-          "value": "8388608T",
-          "context": "source: /sys/fs/cgroup/memory/memory.limit_in_bytes, writable: false, size: 8388608T"
-      },
-      "cpu": {
-          "context": "source: /sys/fs/cgroup/cpu/cpu.cfs_quota_us, writable: false"
-      }
-  }
-}
-```
-
-### /v1/load
-
-> Note, uses all available cores at 100%. Use load duration parameter: `/v1/load?duration=5s` to specify the duration of the load generation across all cores. 
-
-```json
-{
-  "result": {
-      "cores": 2,
-      "operations": 1467302,
-      "duration": "5s"
-      ...
-  }
-}
-```
-
 ### /v1/echo 
 
 Request:
