@@ -64,13 +64,13 @@ terraform init
 Show plan
 
 ```sh
-terraform plan -var=name=restme -var=project_id=cloudy-lab
+terraform plan
 ```
 
 Apply
 
 ```sh
-terraform apply -var=name=restme -var=project_id=cloudy-lab
+terraform apply
 ```
 
 The output will be the LB IP 
@@ -78,6 +78,6 @@ The output will be the LB IP
 ## clean up
 
 ```sh
-terraform destroy -var=name=restme -var=project_id=cloudy-lab
+terraform destroy
 ```
 

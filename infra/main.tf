@@ -2,10 +2,8 @@ provider "google" {
   project = var.project_id
 }
 
-data "google_cloud_run_locations" "default" { }
-
 resource "google_cloud_run_service" "default" {
-  for_each = toset(data.google_cloud_run_locations.default.locations)
+  for_each = toset(var.regions)
 
   name     = "${var.name}--${each.value}"
   location = each.value
@@ -33,7 +31,7 @@ resource "google_cloud_run_service" "default" {
 }
 
 resource "google_cloud_run_service_iam_member" "default" {
-  for_each = toset(data.google_cloud_run_locations.default.locations)
+  for_each = toset(var.regions)
 
   location = google_cloud_run_service.default[each.key].location
   project  = google_cloud_run_service.default[each.key].project
@@ -44,7 +42,7 @@ resource "google_cloud_run_service_iam_member" "default" {
 
 
 resource "google_compute_region_network_endpoint_group" "default" {
-  for_each = toset(data.google_cloud_run_locations.default.locations)
+  for_each = toset(var.regions)
 
   name                  = "${var.name}--neg--${each.key}"
   network_endpoint_type = "SERVERLESS"
