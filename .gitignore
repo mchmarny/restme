@@ -10,7 +10,5 @@
 # Binaries
 bin
 
-# Keys
-*.key
-test.token
+# Keys 
 cosign.*

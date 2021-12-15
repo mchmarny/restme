@@ -8,7 +8,6 @@ test_get_endpoint() {
     local url=$1
     curl -i \
          -H "Content-Type: application/json" \
-         -H "Authorization: Bearer ${AUTH_TOKEN}" \
          $url
     printf "\n"
 }
@@ -17,7 +16,6 @@ test_echo_post() {
     local url=$1
     curl -i \
          -H "Content-Type: application/json" \
-         -H "Authorization: Bearer ${AUTH_TOKEN}" \
          $url -d@- <<EOF
 {
     "on": $(date +%s),

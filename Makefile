@@ -1,8 +1,6 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.6.4
+RELEASE_VERSION  ?=v0.6.6
 KO_DOCKER_REPO   ?=gcr.io/cloudy-lab
-TEST_AUTH_TOKEN  ?=test/test.token
-SERVICE_URL      :=$(shell gcloud run services describe restme --region us-west1 --format='value(status.url)')
 
 all: help
 
@@ -11,7 +9,7 @@ version: ## Outputs current verison
 .PHONY: version
 
 url: ## Outputs service url
-	@echo $(SERVICE_URL)
+	@echo $(shell gcloud run services describe restme --region us-west1 --format='value(status.url)')
 .PHONY: url
 
 tidy: ## Updates the go modules and vendors all dependancies 
@@ -28,50 +26,15 @@ lint: ## Lints the entire project
 .PHONY: lint
 
 run: ## Runs uncompiled Go service code
-	LOG_LEVEL=debug ADDRESS=":8080" KEY_FILE="test/test.key" go run ./cmd/service/main.go
+	LOG_LEVEL=debug ADDRESS=":8080" go run ./cmd/main.go
 .PHONY: run
-
-cli: ## Compiles the CLI code.
-	CGO_ENABLED=0 \
-	GOFLAGS="-ldflags=-X=main.appVersion=$(RELEASE_VERSION)" \
-		go build -a -mod vendor -o bin/restme-cli ./cmd/cli/
-	bin/restme-cli --help
-.PHONY: cli
-
-token: ## Runs uncompiled Go CLI to generate token
-	bin/restme-cli token create \
-		--secret test/test.key \
-		--issuer test \
-		--email demo@domain.com \
-		--ttl "30s"
-.PHONY: token
 
 verify: ## Runs verification test against the running service
 	AUTH_TOKEN="$(shell cat $(TEST_AUTH_TOKEN))" test/endpoints "http://localhost:8080"
 .PHONY: verify
 
-message: ## Invokes echo service 
-	curl -i \
-	     -H "Content-Type: application/json" \
-	     -H "Authorization: Bearer $(shell cat $(TEST_AUTH_TOKEN))" \
-		 $(SERVICE_URL)/v1/echo/message \
-		 -d '{ "on": $(shell date +%s), "msg": "hello?" }'
-.PHONY: message
-
-request: ## Invokes request service 
-	curl -i \
-	     -H "Content-Type: application/json" \
-	     -H "Authorization: Bearer $(shell cat $(TEST_AUTH_TOKEN))" \
-		 $(SERVICE_URL)/v1/request/info
-.PHONY: request
-
-metrics: ## Collects metrics 
-	curl $(SERVICE_URL)/metrics
-.PHONY: metrics
-
 build: ## Compiles the Service code.
-	CGO_ENABLED=0 go build -a -mod vendor -o bin/rester ./cmd/service/
-	GIN_MODE=release LOG_JSON=true bin/restme
+	CGO_ENABLED=0 go build -a -mod vendor -o bin/rester ./cmd/
 .PHONY: build
 
 upgrade: ## Upgrades all dependancies 
@@ -82,7 +45,7 @@ upgrade: ## Upgrades all dependancies
 image: ## Creates container image using ko
 	KO_DOCKER_REPO=$(KO_DOCKER_REPO)/$(SERVICE_NAME) \
 	GOFLAGS="-ldflags=-X=main.version=$(RELEASE_VERSION)" \
-		ko publish ./cmd/service/ --bare --tags $(RELEASE_VERSION),latest
+		ko publish ./cmd/ --bare --tags $(RELEASE_VERSION),latest
 	COSIGN_PASSWORD="" cosign sign \
 		--key cosign.key \
 		-a tag=$(RELEASE_VERSION) \

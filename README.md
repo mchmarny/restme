@@ -6,7 +6,6 @@ Collection of REST services
 
 * [Request](#v1resource) - client request, headers and environment variables 
 * [Resources](#v1resource) - host info, and RAM/CPU resources 
-* [Load](#v1load)
 
 ### /v1/request
 
@@ -53,3 +52,32 @@ Response:
 ```json
 { "on": 1620438323, "msg": "hello?" }
 ```
+
+## deployment 
+
+Initialize:
+
+```sh
+terraform init
+```
+
+Show plan
+
+```sh
+terraform plan -var=name=restme -var=project_id=cloudy-lab
+```
+
+Apply
+
+```sh
+terraform apply -var=name=restme -var=project_id=cloudy-lab
+```
+
+The output will be the LB IP 
+
+## clean up
+
+```sh
+terraform destroy -var=name=restme -var=project_id=cloudy-lab
+```
+

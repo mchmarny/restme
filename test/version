@@ -7,7 +7,6 @@ readonly VERSION=$2
 
 main() {
     local current=$(curl -H "Content-Type: application/json" \
-                         -H "Authorization: Bearer ${AUTH_TOKEN}" \
                          "${URL}/v1/request/info" | jq -r ".request.version")
 
     if [ "$current" != "$VERSION" ]; then
