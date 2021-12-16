@@ -1,6 +1,7 @@
 SERVICE_NAME     ?=restme
 RELEASE_VERSION  ?=v0.6.6
 KO_DOCKER_REPO   ?=gcr.io/cloudy-lab
+SERVICE_URL      ?=https://restme.cloudylab.dev
 
 all: help
 
@@ -30,7 +31,8 @@ run: ## Runs uncompiled Go service code
 .PHONY: run
 
 verify: ## Runs verification test against the running service
-	AUTH_TOKEN="$(shell cat $(TEST_AUTH_TOKEN))" test/endpoints "http://localhost:8080"
+	test/version $(SERVICE_URL) $(RELEASE_VERSION)
+	test/endpoints $(SERVICE_URL)
 .PHONY: verify
 
 build: ## Compiles the Service code.
