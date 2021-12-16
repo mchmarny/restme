@@ -2,6 +2,10 @@ provider "google" {
   project = var.project_id
 }
 
+resource "google_service_account" "service_account" {
+  account_id   = "${var.name}-runner"
+  display_name = "Service Account to run ${var.name}"
+}
 
 module "lb-http" {
   source            = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
@@ -88,6 +92,7 @@ resource "google_cloud_run_service" "default" {
         }
       }
       container_concurrency = 80
+      service_account_name  = google_service_account.service_account.email
     }
   }
 
@@ -97,6 +102,8 @@ resource "google_cloud_run_service" "default" {
       release     = "${var.release}"
     }
   }
+
+  depends_on = [google_service_account.service_account]
 }
 
 resource "google_cloud_run_service_iam_member" "public-access" {
