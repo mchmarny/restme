@@ -62,25 +62,25 @@ resource "google_compute_region_network_endpoint_group" "serverless_neg" {
 resource "google_cloud_run_service" "default" {
   for_each = toset(var.regions)
 
-  name     = "${var.name}--${each.value}"
-  location = each.value
-  project  = var.project_id
-
+  name                       = "${var.name}--${each.value}"
+  location                   = each.value
+  project                    = var.project_id
   autogenerate_revision_name = true
 
   template {
     spec {
       containers {
         image = var.image
+        ports {
+          name           = var.ports["name"]
+          container_port = var.ports["port"]
+        }
         resources {
-          limits = {
-            memory = var.memory
-            cpu    = var.cpu
-          }
+          limits   = var.limits
         }
         env {
           name = "ADDRESS"
-          value = ":8080"
+          value = ":${var.ports["port"]}"
         }
         env {
           name = "GIN_MODE"
@@ -91,7 +91,8 @@ resource "google_cloud_run_service" "default" {
           value = "debug"
         }
       }
-      container_concurrency = 80
+      container_concurrency = var.container_concurrency
+      timeout_seconds       = var.request_timeout
       service_account_name  = google_service_account.service_account.email
     }
   }

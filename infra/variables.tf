@@ -7,7 +7,7 @@ variable "project_id" {
 variable "release" {
   description = "Git commit sha (e.g. git rev-parse --short HEAD)"
   type        = string
-  default     = "1acc66a"
+  default     = "d0b54b3"
 }
 
 variable "name" {
@@ -34,14 +34,35 @@ variable "domain" {
   default     = "restme.cloudylab.dev"
 }
 
-variable "memory" {
-  description = "Memory limit for container"
-  type        = string
-  default     = "512Mi"
+variable "limits" {
+  type        = map(string)
+  description = "Resource limits to the container"
+  default     = {
+    cpu = "1000m"
+    memory = "512Mi"
+  }
 }
 
-variable "cpu" {
-  description = "CPU limit for container"
-  type        = string
-  default     = "1000m"
+variable "ports" {
+  type = object({
+    name = string
+    port = number
+  })
+  description = "Port which the container listens to (http1 or h2c)"
+  default = {
+    name = "http1"
+    port = 8080
+  }
+}
+
+variable "container_concurrency" {
+  type        = number
+  description = "Concurrent request limits to the service"
+  default     = 80
+}
+
+variable "request_timeout" {
+  type        = number
+  description = "Timeout for each request in seconds"
+  default     = 120
 }
