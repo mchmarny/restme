@@ -2,10 +2,6 @@ provider "google" {
   project = var.project_id
 }
 
-provider "google-beta" {
-  project = var.project_id
-}
-
 
 module "lb-http" {
   source            = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
@@ -49,7 +45,6 @@ module "lb-http" {
 }
 
 resource "google_compute_region_network_endpoint_group" "serverless_neg" {
-  provider = google-beta
   for_each = toset(var.regions)
 
   name                  = "${var.name}--neg--${each.key}"
@@ -67,10 +62,18 @@ resource "google_cloud_run_service" "default" {
   location = each.value
   project  = var.project_id
 
+  autogenerate_revision_name = true
+
   template {
     spec {
       containers {
         image = var.image
+        resources {
+          limits = {
+            memory = var.memory
+            cpu    = var.cpu
+          }
+        }
         env {
           name = "ADDRESS"
           value = ":8080"
@@ -84,6 +87,14 @@ resource "google_cloud_run_service" "default" {
           value = "debug"
         }
       }
+      container_concurrency = 80
+    }
+  }
+
+  metadata {
+    labels = {
+      terraformed = "true"
+      release     = "${var.release}"
     }
   }
 }

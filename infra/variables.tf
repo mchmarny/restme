@@ -4,6 +4,12 @@ variable "project_id" {
   default     = "cloudy-lab"
 }
 
+variable "release" {
+  description = "Git commit sha (e.g. git rev-parse --short HEAD)"
+  type        = string
+  default     = "1acc66a"
+}
+
 variable "name" {
   description = "name prefix for resources"
   type        = string
@@ -26,4 +32,16 @@ variable "domain" {
   description = "Domain for SSL cert"
   type        = string
   default     = "restme.cloudylab.dev"
+}
+
+variable "memory" {
+  description = "Memory limit for container"
+  type        = string
+  default     = "512Mi"
+}
+
+variable "cpu" {
+  description = "CPU limit for container"
+  type        = string
+  default     = "1000m"
 }
