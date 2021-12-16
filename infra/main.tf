@@ -2,6 +2,64 @@ provider "google" {
   project = var.project_id
 }
 
+provider "google-beta" {
+  project = var.project_id
+}
+
+
+module "lb-http" {
+  source            = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
+  version           = "~> 5.1"
+
+  project = var.project_id
+  name    = var.name
+
+  ssl                             = true
+  managed_ssl_certificate_domains = [var.domain]
+  https_redirect                  = true
+
+  backends = {
+    default = {
+      description             = null
+      enable_cdn              = false
+      security_policy         = null
+      custom_request_headers  = null
+      custom_response_headers = null
+
+      groups = [
+        for neg in google_compute_region_network_endpoint_group.serverless_neg:
+        {
+          group = neg.id
+        }
+      ]
+
+      iap_config = {
+        enable               = false
+        oauth2_client_id     = ""
+        oauth2_client_secret = ""
+      }
+
+      log_config = {
+        enable      = false
+        sample_rate = null
+      }
+
+    }
+  }
+}
+
+resource "google_compute_region_network_endpoint_group" "serverless_neg" {
+  provider = google-beta
+  for_each = toset(var.regions)
+
+  name                  = "${var.name}--neg--${each.key}"
+  network_endpoint_type = "SERVERLESS"
+  region                = google_cloud_run_service.default[each.key].location
+  cloud_run {
+    service = google_cloud_run_service.default[each.key].name
+  }
+}
+
 resource "google_cloud_run_service" "default" {
   for_each = toset(var.regions)
 
@@ -30,7 +88,7 @@ resource "google_cloud_run_service" "default" {
   }
 }
 
-resource "google_cloud_run_service_iam_member" "default" {
+resource "google_cloud_run_service_iam_member" "public-access" {
   for_each = toset(var.regions)
 
   location = google_cloud_run_service.default[each.key].location
@@ -41,55 +99,3 @@ resource "google_cloud_run_service_iam_member" "default" {
 }
 
 
-resource "google_compute_region_network_endpoint_group" "default" {
-  for_each = toset(var.regions)
-
-  name                  = "${var.name}--neg--${each.key}"
-  network_endpoint_type = "SERVERLESS"
-  region                = google_cloud_run_service.default[each.key].location
-  cloud_run {
-    service = google_cloud_run_service.default[each.key].name
-  }
-}
-
-module "lb-http" {
-  source            = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
-  version           = "~> 4.5"
-
-  project = var.project_id
-  name    = var.name
-
-  ssl                             = false
-  managed_ssl_certificate_domains = []
-  https_redirect                  = false
-  backends = {
-    default = {
-      description            = null
-      enable_cdn             = false
-      custom_request_headers = null
-
-      log_config = {
-        enable      = true
-        sample_rate = 1.0
-      }
-
-      groups = [
-        for neg in google_compute_region_network_endpoint_group.default:
-        {
-          group = neg.id
-        }
-      ]
-
-      iap_config = {
-        enable               = false
-        oauth2_client_id     = null
-        oauth2_client_secret = null
-      }
-      security_policy = null
-    }
-  }
-}
-
-output "url" {
-  value = "http://${module.lb-http.external_ip}"
-}

@@ -21,3 +21,9 @@ variable "regions" {
   type        = list
   default     = ["us-west1", "europe-west1", "asia-east1"]
 }
+
+variable "domain" {
+  description = "Domain for SSL cert"
+  type        = string
+  default     = "restme.cloudylab.dev"
+}
