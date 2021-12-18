@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.6.6
+RELEASE_VERSION  ?=v0.6.7
 KO_DOCKER_REPO   ?=gcr.io/cloudy-lab
 SERVICE_URL      ?=https://restme.cloudylab.dev
 
@@ -41,7 +41,8 @@ build: ## Compiles the Service code.
 
 upgrade: ## Upgrades all dependancies 
 	go get -u ./...
-	go mod tidy 
+	go mod tidy
+	go mod vendor
 .PHONY: upgrade
 
 image: ## Creates container image using ko

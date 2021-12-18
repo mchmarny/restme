@@ -19,7 +19,7 @@ variable "name" {
 variable "image" {
   description = "container image to deploy"
   type        = string
-  default     = "gcr.io/cloudy-lab/restme"
+  default     = "gcr.io/cloudy-lab/restme@sha256:cb1504a56908242958ddccf856d06060d30c4d1abc9c5f4d1dbf5c8960e3a6d9"
 }
 
 variable "regions" {
@@ -66,3 +66,13 @@ variable "request_timeout" {
   description = "Timeout for each request in seconds"
   default     = 120
 }
+
+variable "api_key" {
+  type        = string
+  description = "API key version data"
+  default     = "test-value"
+}
+
+
+
+

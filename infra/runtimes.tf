@@ -23,6 +23,10 @@ resource "google_cloud_run_service" "default" {
           value = ":${var.ports["port"]}"
         }
         env {
+          name = "IMAGE"
+          value = var.image
+        }
+        env {
           name = "GIN_MODE"
           value = "release"
         }
@@ -30,7 +34,17 @@ resource "google_cloud_run_service" "default" {
           name = "LOG_LEVEL"
           value = "debug"
         }
+        env {
+          name = "API_KEY"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.secret_api_key.secret_id
+              key = "latest"
+            }
+          }
+        }
       }
+
       container_concurrency = var.container_concurrency
       timeout_seconds       = var.request_timeout
       service_account_name  = google_service_account.service_account.email
@@ -44,7 +58,15 @@ resource "google_cloud_run_service" "default" {
     }
   }
 
-  depends_on = [google_service_account.service_account]
+  lifecycle {
+    ignore_changes = [
+        metadata.0.annotations,
+    ]
+  }
+
+  depends_on = [
+    google_secret_manager_secret_iam_policy.api_key_secret_access_policy,
+  ]
 }
 
 resource "google_cloud_run_service_iam_member" "public-access" {

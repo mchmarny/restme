@@ -5,14 +5,14 @@ resource "google_compute_global_address" "lb_ip_address" {
   address_type = "EXTERNAL"
   ip_version   = "IPV4"
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }
 
 module "lb-http" {
   source            = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
-  version           = "~> 5.1"
+  version           = "6.2.0"
 
   project = var.project_id
   name    = var.name
@@ -50,7 +50,6 @@ module "lb-http" {
 
     }
   }
-  depends_on = [google_compute_security_policy.policy]
 }
 
 resource "google_compute_region_network_endpoint_group" "serverless_neg" {
@@ -59,6 +58,7 @@ resource "google_compute_region_network_endpoint_group" "serverless_neg" {
   name                  = "${var.name}--neg--${each.key}"
   network_endpoint_type = "SERVERLESS"
   region                = google_cloud_run_service.default[each.key].location
+  
   cloud_run {
     service = google_cloud_run_service.default[each.key].name
   }
