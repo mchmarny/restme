@@ -56,8 +56,8 @@ jobs:
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
           id_token_include_email: true
 
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@master
+    # - name: Set up Cloud SDK
+    #   uses: google-github-actions/setup-gcloud@master
 
     - name: Auth to GCP
       run: |-
