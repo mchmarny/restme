@@ -63,4 +63,5 @@ jobs:
       run: |
         gcloud builds submit \
           --project ${{ secrets.PROJECT_ID }} \
-          --tag "gcr.io/${{ secrets.PROJECT_ID }}/restme:${{ env.RELEASE_VERSION }}"
+          --gcs-log-dir gs://${{ secrets.PROJECT_ID }}-cloudbuild-logs/${REPO} \
+          --tag "gcr.io/${{ secrets.PROJECT_ID }}/${REPO}:${{ env.RELEASE_VERSION }}"
