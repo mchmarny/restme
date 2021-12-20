@@ -9,3 +9,8 @@ resource "google_service_account" "publisher_service_account" {
   display_name = "${var.name}-publisher"
 }
 
+resource "google_project_iam_member" "firestore_owner_binding" {
+  project = var.project_id
+  role    = "roles/cloudbuild.builds.editor"
+  member  = "serviceAccount:${google_service_account.publisher_service_account.email}"
+}

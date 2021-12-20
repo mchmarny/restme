@@ -10,6 +10,12 @@ resource "google_project_service" "containerregistry" {
 
   disable_on_destroy = false
 }
+resource "google_project_service" "cloudbuild" {
+  project = var.project_id
+  service = "cloudbuild.googleapis.com"
+
+  disable_on_destroy = false
+}
 resource "google_project_service" "dns" {
   project = var.project_id
   service = "dns.googleapis.com"
