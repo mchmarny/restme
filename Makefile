@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.6.24
+RELEASE_VERSION  ?=v0.6.27
 TARGET_REGISTRY  ?=gcr.io
 SERVICE_URL      ?=https://restme.cloudylab.dev
 
