@@ -47,34 +47,23 @@ jobs:
       run: |
         echo "RELEASE_VERSION=$(make version)" >> $GITHUB_ENV
 
-    - name: Install cosign
-      uses: sigstore/cosign-installer@main
-      with:
-        cosign-release: 'v1.3.1'
-
-    - name: Install Ko
-      uses: imjasonh/setup-ko@v0.4
-
     - id: auth
       name: Get GCP token
       uses: google-github-actions/auth@v0.4.0
       with:
-          create_credentials_file: true
-          workload_identity_provider: $WORKLOAD_IDENTITY_PROVIDER
-          service_account: $SERVICE_ACCOUNT
+          create_credentials_file: "true"
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v0.3.0
-
 
     - name: Auth to GCP
       run: |-
         gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
         
-
     - name: Publish Image
       run: |
         gcloud builds submit \
-          --project $PROJECT_ID \
-          --tag "gcr.io/${PROJECT_ID}/restme:${{ env.RELEASE_VERSION }}"
-
+          --project ${{ secrets.PROJECT_ID }} \
+          --tag "gcr.io/${{ secrets.PROJECT_ID }}/restme:${{ env.RELEASE_VERSION }}"
