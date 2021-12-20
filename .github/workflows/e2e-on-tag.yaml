@@ -46,6 +46,7 @@ jobs:
     - name: Capture Version
       run: |
         echo "RELEASE_VERSION=$(make version)" >> $GITHUB_ENV
+        echo "SERVICE_NAME=$(make name)" >> $GITHUB_ENV
 
     - id: auth
       name: Get GCP token
@@ -63,4 +64,4 @@ jobs:
       run: |
         gcloud builds submit \
           --project ${{ secrets.PROJECT_ID }} \
-          --tag "gcr.io/${{ secrets.PROJECT_ID }}/${REPO}:${{ env.RELEASE_VERSION }}"
+          --tag "gcr.io/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ env.RELEASE_VERSION }}"

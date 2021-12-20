@@ -5,6 +5,10 @@ SERVICE_URL      ?=https://restme.cloudylab.dev
 
 all: help
 
+name: ## Outputs service name
+	@echo $(SERVICE_NAME)
+.PHONY: name
+
 version: ## Outputs current verison
 	@echo $(RELEASE_VERSION)
 .PHONY: version
