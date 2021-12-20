@@ -1,0 +1,16 @@
+.github
+.git
+.cache
+.codecov.yaml
+.golangci.yaml
+
+analyzers.yml
+cosign.*
+cover.out
+
+*.md
+
+infra
+test
+
+Makefile

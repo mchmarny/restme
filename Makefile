@@ -1,6 +1,6 @@
 SERVICE_NAME     ?=restme
 RELEASE_VERSION  ?=v0.6.8
-KO_DOCKER_REPO   ?=gcr.io/cloudy-lab
+TARGET_REGISTRY  ?=gcr.io/cloudy-lab
 SERVICE_URL      ?=https://restme.cloudylab.dev
 
 all: help
@@ -46,16 +46,9 @@ upgrade: ## Upgrades all dependancies
 .PHONY: upgrade
 
 image: ## Creates container image using ko
-	KO_DOCKER_REPO=$(KO_DOCKER_REPO)/$(SERVICE_NAME) \
-	GOFLAGS="-ldflags=-X=main.version=$(RELEASE_VERSION)" \
-		ko publish ./cmd/ --bare --tags $(RELEASE_VERSION),latest
-	COSIGN_PASSWORD="" cosign sign \
-		--key cosign.key \
-		-a tag=$(RELEASE_VERSION) \
-		$(KO_DOCKER_REPO)/$(SERVICE_NAME)
-	COSIGN_PASSWORD="" cosign verify \
-		--key cosign.pub \
-		$(KO_DOCKER_REPO)/$(SERVICE_NAME)
+	gcloud builds submit \
+		--project $(PROJECT_ID) \
+		--tag "$(TARGET_REGISTRY)/$(SERVICE_NAME):$(RELEASE_VERSION)"
 .PHONY: tag
 
 tag: ## Creates release tag 
