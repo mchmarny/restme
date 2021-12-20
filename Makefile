@@ -13,14 +13,16 @@ version: ## Outputs current verison
 	@echo $(RELEASE_VERSION)
 .PHONY: version
 
-url: ## Outputs service url
-	@echo $(shell gcloud run services describe restme --region us-west1 --format='value(status.url)')
-.PHONY: url
-
 tidy: ## Updates the go modules and vendors all dependancies 
 	go mod tidy
 	go mod vendor
 .PHONY: tidy
+
+upgrade: ## Upgrades all dependancies 
+	go get -u ./...
+	go mod tidy
+	go mod vendor
+.PHONY: upgrade
 
 test: ## Runs tests on the entire project 
 	go test -count=1 -race -covermode=atomic -coverprofile=cover.out ./...
@@ -39,17 +41,7 @@ verify: ## Runs verification test against the running service
 	test/endpoints $(SERVICE_URL)
 .PHONY: verify
 
-build: ## Compiles the Service code.
-	CGO_ENABLED=0 go build -a -mod vendor -o bin/rester ./cmd/
-.PHONY: build
-
-upgrade: ## Upgrades all dependancies 
-	go get -u ./...
-	go mod tidy
-	go mod vendor
-.PHONY: upgrade
-
-image: ## Creates container image using ko
+image: ## Creates container image using Cloud Build
 	gcloud builds submit \
 		--project $(PROJECT_ID) \
 		--tag "$(TARGET_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(RELEASE_VERSION)"

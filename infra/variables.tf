@@ -13,7 +13,7 @@ variable "name" {
 variable "image" {
   description = "container image to deploy"
   type        = string
-  default     = "gcr.io/cloudy-labs/restme:v0.6.22"
+  default     = "gcr.io/cloudy-labs/restme:v0.6.27"
 }
 
 variable "regions" {

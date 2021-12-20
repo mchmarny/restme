@@ -1,6 +1,6 @@
 resource "google_iam_workload_identity_pool" "github_pool" {
   provider                  = google-beta
-  workload_identity_pool_id = "github-pool-${var.name}"
+  workload_identity_pool_id = "github-id-pool-${var.name}"
 }
 
 resource "google_iam_workload_identity_pool_provider" "github_provider" {
