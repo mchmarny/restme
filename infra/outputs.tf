@@ -1,4 +1,8 @@
 
+output "project_number" {
+  value = data.google_project.project.number
+}
+
 output "external_url" {
   value = "${module.lb-http.external_ip} >> https://${var.domain}/"
 }

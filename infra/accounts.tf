@@ -32,3 +32,26 @@ resource "google_project_iam_member" "publisher_storage_view_binding" {
   role    = "roles/storage.admin"
   member  = "serviceAccount:${google_service_account.publisher_service_account.email}"
 }
+
+resource "google_storage_bucket" "builder_logs_bucket" {
+  name          = "${data.google_project.project.number}-cloudbuild-logs"
+  location      = "US"
+  force_destroy = true
+}
+
+data "google_iam_policy" "admin" {
+  binding {
+    role = "roles/storage.admin"
+    members = [
+      "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com",
+      "serviceAccount:${google_service_account.publisher_service_account.email}",
+    ]
+  }
+}
+
+resource "google_storage_bucket_iam_policy" "build_logs_bucket_policy" {
+  bucket = google_storage_bucket.builder_logs_bucket.name
+  policy_data = data.google_iam_policy.admin.policy_data
+}
+
+
