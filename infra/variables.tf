@@ -4,6 +4,12 @@ variable "project_id" {
   default     = "cloudy-lab"
 }
 
+variable "project_id" {
+  description = "GCP Project ID"
+  type        = string
+  default     = "cloudy-lab"
+}
+
 variable "release" {
   description = "Git commit sha (e.g. git rev-parse --short HEAD)"
   type        = string
