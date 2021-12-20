@@ -15,6 +15,12 @@ resource "google_project_iam_member" "publisher_builder_binding" {
   member  = "serviceAccount:${google_service_account.publisher_service_account.email}"
 }
 
+resource "google_project_iam_member" "publisher_agent_binding" {
+  project = var.project_id
+  role    = "roles/cloudbuild.serviceAgent"
+  member  = "serviceAccount:${google_service_account.publisher_service_account.email}"
+}
+
 resource "google_project_iam_member" "publisher_storage_create_binding" {
   project = var.project_id
   role    = "roles/storage.objectCreator"
@@ -23,6 +29,6 @@ resource "google_project_iam_member" "publisher_storage_create_binding" {
 
 resource "google_project_iam_member" "publisher_storage_view_binding" {
   project = var.project_id
-  role    = "roles/storage.objectViewer"
+  role    = "roles/storage.admin"
   member  = "serviceAccount:${google_service_account.publisher_service_account.email}"
 }

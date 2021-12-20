@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.6.20
+RELEASE_VERSION  ?=v0.6.21
 TARGET_REGISTRY  ?=gcr.io/cloudy-lab
 SERVICE_URL      ?=https://restme.cloudylab.dev
 
