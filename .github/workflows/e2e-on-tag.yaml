@@ -51,12 +51,13 @@ jobs:
       name: Get GCP token
       uses: google-github-actions/auth@v0.4.3
       with:
-          create_credentials_file: "true"
+          create_credentials_file: true
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          id_token_include_email: true
 
     - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0.3.0
+      uses: google-github-actions/setup-gcloud@master
 
     - name: Auth to GCP
       run: |-
