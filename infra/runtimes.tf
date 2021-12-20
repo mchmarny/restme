@@ -54,7 +54,6 @@ resource "google_cloud_run_service" "default" {
   metadata {
     labels = {
       terraformed = "true"
-      release     = "${var.release}"
     }
   }
 

@@ -1,6 +1,6 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.6.22
-TARGET_REGISTRY  ?=gcr.io/cloudy-lab
+RELEASE_VERSION  ?=v0.6.23
+TARGET_REGISTRY  ?=gcr.io
 SERVICE_URL      ?=https://restme.cloudylab.dev
 
 all: help
@@ -48,7 +48,7 @@ upgrade: ## Upgrades all dependancies
 image: ## Creates container image using ko
 	gcloud builds submit \
 		--project $(PROJECT_ID) \
-		--tag "$(TARGET_REGISTRY)/$(SERVICE_NAME):$(RELEASE_VERSION)"
+		--tag "$(TARGET_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(RELEASE_VERSION)"
 .PHONY: tag
 
 tag: ## Creates release tag 

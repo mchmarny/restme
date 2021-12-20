@@ -1,22 +1,9 @@
-resource "google_compute_global_address" "lb_ip_address" {
-  project = var.project_id
-  name    = "lb-ip-address"
-
-  address_type = "EXTERNAL"
-  ip_version   = "IPV4"
-
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
-}
-
 module "lb-http" {
   source            = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
   version           = "6.2.0"
 
   project = var.project_id
   name    = var.name
-  address = google_compute_global_address.lb_ip_address.address
 
   ssl                             = true
   managed_ssl_certificate_domains = [var.domain]

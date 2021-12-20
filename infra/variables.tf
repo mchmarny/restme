@@ -1,19 +1,7 @@
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
-  default     = "cloudy-lab"
-}
-
-variable "project_id" {
-  description = "GCP Project ID"
-  type        = string
-  default     = "cloudy-lab"
-}
-
-variable "release" {
-  description = "Git commit sha (e.g. git rev-parse --short HEAD)"
-  type        = string
-  default     = "d0b54b3"
+  default     = "cloudy-labs"
 }
 
 variable "name" {
@@ -25,7 +13,7 @@ variable "name" {
 variable "image" {
   description = "container image to deploy"
   type        = string
-  default     = "gcr.io/cloudy-lab/restme:v0.6.18"
+  default     = "gcr.io/cloudy-labs/restme:v0.6.22"
 }
 
 variable "regions" {
