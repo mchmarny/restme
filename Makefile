@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.6.7
+RELEASE_VERSION  ?=v0.6.8
 KO_DOCKER_REPO   ?=gcr.io/cloudy-lab
 SERVICE_URL      ?=https://restme.cloudylab.dev
 

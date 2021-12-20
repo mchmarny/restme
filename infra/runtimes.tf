@@ -47,7 +47,7 @@ resource "google_cloud_run_service" "default" {
 
       container_concurrency = var.container_concurrency
       timeout_seconds       = var.request_timeout
-      service_account_name  = google_service_account.service_account.email
+      service_account_name  = google_service_account.runner_service_account.email
     }
   }
 

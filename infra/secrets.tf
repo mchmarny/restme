@@ -22,7 +22,7 @@ data "google_iam_policy" "secret_reader" {
     role = "roles/secretmanager.secretAccessor"
 
     members = [
-      "serviceAccount:${google_service_account.service_account.email}",
+      "serviceAccount:${google_service_account.runner_service_account.email}",
     ]
   }
 }

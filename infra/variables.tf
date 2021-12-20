@@ -19,13 +19,18 @@ variable "name" {
 variable "image" {
   description = "container image to deploy"
   type        = string
-  default     = "gcr.io/cloudy-lab/restme@sha256:cb1504a56908242958ddccf856d06060d30c4d1abc9c5f4d1dbf5c8960e3a6d9"
+  default     = "gcr.io/cloudy-lab/restme@sha256:3270e29a6da8c4345cb08441d95d489fa9c4e6fa10fe9cd8c9ca8881011b2473"
 }
 
 variable "regions" {
   description = "list of GPC regions to deploy to"
   type        = list
   default     = ["us-west1", "europe-west1", "asia-east1"]
+}
+
+variable "registry_region" {
+  type    = string
+  default = "us-west1"
 }
 
 variable "domain" {

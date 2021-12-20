@@ -9,6 +9,9 @@ jobs:
 
   e2e-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
 
     - name: Setup Go
@@ -43,87 +46,35 @@ jobs:
     - name: Capture Version
       run: |
         echo "RELEASE_VERSION=$(make version)" >> $GITHUB_ENV
-        
+
+    - name: Install cosign
+      uses: sigstore/cosign-installer@main
+      with:
+        cosign-release: 'v1.3.1'
+
     - name: Install Ko
       uses: imjasonh/setup-ko@v0.4
 
-    - name: Install jq
-      run: |
-        wget http://stedolan.github.io/jq/download/linux64/jq
-        chmod +x ./jq
-        sudo cp jq /usr/bin
-
-    - name: Setup Cluster
-      uses: engineerd/setup-kind@v0.5.0
-      with:
-        version: "v0.11.1"
-        wait: "600s"
-        config: configs/ci-cluster.yaml
-
-    - name: Check Cluster
-      run: |
-        kubectl cluster-info
-        echo "current-context:" $(kubectl config current-context)
-        kubectl get pods -n kube-system
-        sleep 5
-        for pod in $(kubectl get pods --no-headers -n kube-system -o custom-columns=":metadata.name"); do \
-          kubectl wait --for=condition=Ready pod/$pod --timeout=300s -n kube-system; done
-
-    - name: Configure Cluster 
-      run: | 
-        kubectl create secret generic auth-key --from-file=key=./test/test.key
-
-    - name: Deploy Service
-      run: |
-        echo "current-context:" $(kubectl config current-context)
-        KO_DOCKER_REPO=kind.local \
-          GOFLAGS="-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}" \
-          ko resolve -f deployments/ci-template.yaml | kubectl apply -f -
-
-    - name: Verify Deployment
-      run: | 
-        sleep 30
-        kubectl get pods -l app=restme
-        kubectl describe pods -l app=restme
-        kubectl logs -l app=restme
-        kubectl rollout status deployment/restme
-
-        kubectl get services -l app=restme
-        kubectl get nodes -o wide
-        
-    - name: Test Integration 
-      run: | 
-        NODE_IP=( $(kubectl get nodes \
-          -l kubernetes.io/hostname!=kind-control-plane \
-          -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}') )
-        SERVICE_URL="http://${NODE_IP[0]}:30080"
-        TOKEN=$(cat test/test.token)
-        AUTH_TOKEN="${TOKEN}" test/endpoints "${SERVICE_URL}"
-        AUTH_TOKEN="${TOKEN}" test/version "${SERVICE_URL}" "${{ env.RELEASE_VERSION }}"
-
-
-    - id: Auth to GCP
+    - id: auth
+      name: Get GCP token
       uses: google-github-actions/auth@v0.4.0
       with:
-        workload_identity_provider: 'projects/756793645202/locations/global/workloadIdentityPools/restme-pool/providers/restme-provider'
-        service_account: 'restme-sa@cloudy-lab.iam.gserviceaccount.com'
+          create_credentials_file: true
+          workload_identity_provider: $WORKLOAD_IDENTITY_PROVIDER
+          service_account: $SERVICE_ACCOUNT
 
-    - name: Deploy to Cloud Run
-      uses: google-github-actions/deploy-cloudrun@v0.6.0
-      with:
-        image: gcr.io/cloudy-lab/restme
-        service: hello-cloud-run
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0.3.0
 
-    # - name: Publish Image
-    #   run: |
-    #     KO_DOCKER_REPO=ghcr.io/$GITHUB_REPOSITORY \
-    #     GOFLAGS="-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}" \
-    #       ko publish ./cmd/service/ --bare --tags ${{ env.RELEASE_VERSION }},latest
 
-    # - name: Sign Image 
-    #   uses: sigstore/cosign-installer@main
-    #   with:
-    #     cosign-release: 'v1.0.0'
-    
-    # - name: Check Cosign
-    #   run: cosign version
+    - name: Auth to GCP
+      run: |-
+        gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
+        
+
+    - name: Publish Image
+      run: |
+        gcloud builds submit \
+          --project $PROJECT_ID \
+          --tag "gcr.io/${PROJECT_ID}/restme:${{ env.RELEASE_VERSION }}"
+
