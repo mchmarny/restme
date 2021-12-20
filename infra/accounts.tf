@@ -15,8 +15,14 @@ resource "google_project_iam_member" "publisher_builder_binding" {
   member  = "serviceAccount:${google_service_account.publisher_service_account.email}"
 }
 
-resource "google_project_iam_member" "publisher_storage_binding" {
+resource "google_project_iam_member" "publisher_storage_create_binding" {
   project = var.project_id
   role    = "roles/storage.objectCreator"
+  member  = "serviceAccount:${google_service_account.publisher_service_account.email}"
+}
+
+resource "google_project_iam_member" "publisher_storage_view_binding" {
+  project = var.project_id
+  role    = "roles/storage.objectViewer"
   member  = "serviceAccount:${google_service_account.publisher_service_account.email}"
 }
