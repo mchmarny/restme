@@ -16,7 +16,7 @@ resource "google_iam_workload_identity_pool_provider" "github_provider" {
   oidc {
    # This is the only audience GitHub send today.
     allowed_audiences = ["sigstore"]
-    issuer_uri        = "https://vstoken.actions.githubusercontent.com"
+    issuer_uri        = "https://token.actions.githubusercontent.com"
   }
 }
 
