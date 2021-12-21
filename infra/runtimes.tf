@@ -66,6 +66,10 @@ resource "google_cloud_run_service" "default" {
     labels = {
       terraformed = "true"
     }
+    annotations = {
+      "autoscaling.knative.dev/maxScale" = "100"
+      "run.googleapis.com/client-name"   = "terraform"
+    }
   }
 
   traffic {
@@ -79,9 +83,7 @@ resource "google_cloud_run_service" "default" {
     ]
   }
 
-  depends_on = [
-    google_secret_manager_secret_iam_policy.api_key_secret_access_policy,
-  ]
+  depends_on = [google_secret_manager_secret_version.secret_api_key_version]
 }
 
 resource "google_cloud_run_service_iam_member" "public-access" {
