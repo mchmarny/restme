@@ -66,6 +66,12 @@ variable "request_timeout" {
   default     = 120
 }
 
+variable "max_scale" {
+  type        = string
+  description = "Maximum number of service instance annotation"
+  default     = "10"
+}
+
 variable "api_key" {
   type        = string
   description = "API key version data"
