@@ -4,6 +4,12 @@ resource "google_service_account" "runner_service_account" {
   display_name = "${var.name}-runner"
 }
 
+resource "google_storage_bucket_iam_member" "viewer" {
+  bucket = google_container_registry.registry.id
+  role = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.runner_service_account.email}"
+}
+
 resource "google_cloud_run_service" "default" {
   for_each = toset(var.regions)
 

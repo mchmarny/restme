@@ -21,6 +21,10 @@ resource "google_project_iam_member" "publisher_storage_binding" {
   member  = "serviceAccount:${google_service_account.publisher_service_account.email}"
 }
 
+resource "google_container_registry" "registry" {
+  project  = var.project_id
+}
+
 resource "google_iam_workload_identity_pool" "github_pool" {
   provider                  = google-beta
   workload_identity_pool_id = "github-id-pool-${var.name}"
