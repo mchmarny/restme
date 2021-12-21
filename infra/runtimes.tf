@@ -1,4 +1,9 @@
 
+resource "google_service_account" "runner_service_account" {
+  account_id   = "${var.name}-runner"
+  display_name = "${var.name}-runner"
+}
+
 resource "google_cloud_run_service" "default" {
   for_each = toset(var.regions)
 
