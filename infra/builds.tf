@@ -22,7 +22,7 @@ resource "google_project_iam_member" "publisher_storage_binding" {
 }
 
 resource "google_container_registry" "registry" {
-  project  = var.project_id
+  project = var.project_id
 }
 
 resource "google_iam_workload_identity_pool" "github_pool" {

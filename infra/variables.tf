@@ -73,5 +73,12 @@ variable "api_key" {
 }
 
 
+variable "alert_email" {
+  type        = string
+  description = "Email address to which send alerts"
+  default     = "mark+alert@chmarny.com"
+}
+
+
 
 

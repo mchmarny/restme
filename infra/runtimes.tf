@@ -6,7 +6,7 @@ resource "google_service_account" "runner_service_account" {
 
 resource "google_storage_bucket_iam_member" "viewer" {
   bucket = google_container_registry.registry.id
-  role = "roles/storage.objectViewer"
+  role   = "roles/storage.objectViewer"
   member = "serviceAccount:${google_service_account.runner_service_account.email}"
 }
 
@@ -66,6 +66,11 @@ resource "google_cloud_run_service" "default" {
     labels = {
       terraformed = "true"
     }
+  }
+
+  traffic {
+    percent         = 100
+    latest_revision = true
   }
 
   lifecycle {
