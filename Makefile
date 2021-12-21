@@ -47,6 +47,16 @@ image: ## Creates container image using Cloud Build
 		--tag "$(TARGET_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(RELEASE_VERSION)"
 .PHONY: tag
 
+sig: ## Creates container image using Cloud Build
+	COSIGN_PASSWORD="" cosign sign \
+		--key cosign.key \
+		-a tag=$(RELEASE_VERSION) \
+		$(TARGET_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(RELEASE_VERSION)
+	COSIGN_PASSWORD="" cosign verify \
+		--key cosign.pub \
+		$(TARGET_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(RELEASE_VERSION)
+.PHONY: sig
+
 tag: ## Creates release tag 
 	git tag $(RELEASE_VERSION)
 	git push origin $(RELEASE_VERSION)
