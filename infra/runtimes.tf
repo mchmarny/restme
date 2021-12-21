@@ -16,22 +16,22 @@ resource "google_cloud_run_service" "default" {
           container_port = var.ports["port"]
         }
         resources {
-          limits   = var.limits
+          limits = var.limits
         }
         env {
-          name = "ADDRESS"
+          name  = "ADDRESS"
           value = ":${var.ports["port"]}"
         }
         env {
-          name = "IMAGE"
+          name  = "IMAGE"
           value = var.image
         }
         env {
-          name = "GIN_MODE"
+          name  = "GIN_MODE"
           value = "release"
         }
         env {
-          name = "LOG_LEVEL"
+          name  = "LOG_LEVEL"
           value = "debug"
         }
         env {
@@ -39,7 +39,7 @@ resource "google_cloud_run_service" "default" {
           value_from {
             secret_key_ref {
               name = google_secret_manager_secret.secret_api_key.secret_id
-              key = "latest"
+              key  = "latest"
             }
           }
         }
@@ -59,7 +59,7 @@ resource "google_cloud_run_service" "default" {
 
   lifecycle {
     ignore_changes = [
-        metadata.0.annotations,
+      metadata.0.annotations,
     ]
   }
 

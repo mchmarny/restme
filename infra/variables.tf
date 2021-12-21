@@ -18,7 +18,7 @@ variable "image" {
 
 variable "regions" {
   description = "list of GPC regions to deploy to"
-  type        = list
+  type        = list(any)
   default     = ["us-west1", "europe-west1", "asia-east1"]
 }
 
@@ -36,8 +36,8 @@ variable "domain" {
 variable "limits" {
   type        = map(string)
   description = "Resource limits to the container"
-  default     = {
-    cpu = "1000m"
+  default = {
+    cpu    = "1000m"
     memory = "512Mi"
   }
 }
