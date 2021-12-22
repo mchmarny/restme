@@ -34,5 +34,6 @@ resource "google_project_iam_binding" "log-writer" {
 
   members = [
     google_logging_project_sink.run-log-sink.writer_identity,
+    "serviceAccount:${google_service_account.publisher_service_account.email}"
   ]
 }
