@@ -1,1 +1,1 @@
-{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"lb-http","Source":"registry.terraform.io/GoogleCloudPlatform/lb-http/google//modules/serverless_negs","Version":"6.2.0","Dir":".terraform/modules/lb-http/modules/serverless_negs"}]}
+{"Modules":[{"Key":"lb-http","Source":"registry.terraform.io/GoogleCloudPlatform/lb-http/google//modules/serverless_negs","Version":"6.2.0","Dir":".terraform/modules/lb-http/modules/serverless_negs"},{"Key":"","Source":"","Dir":"."}]}

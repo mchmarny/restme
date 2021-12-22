@@ -4,7 +4,7 @@ output "project_number" {
 }
 
 output "external_url" {
-  value = "${module.lb-http.external_ip} >> https://${var.domain}/"
+  value = "${module.lb-http.external_ip} >> https://${var.name}.${var.domain}/"
 }
 
 output "workload_identity_pool_provider_id" {

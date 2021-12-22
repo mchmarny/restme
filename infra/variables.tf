@@ -10,6 +10,12 @@ variable "name" {
   default     = "restme"
 }
 
+variable "domain" {
+  description = "Domain name"
+  type        = string
+  default     = "cloudylab.dev"
+}
+
 variable "image" {
   description = "container image to deploy"
   type        = string
@@ -25,12 +31,6 @@ variable "regions" {
 variable "registry_region" {
   type    = string
   default = "us-west1"
-}
-
-variable "domain" {
-  description = "Domain for SSL cert"
-  type        = string
-  default     = "restme.cloudylab.dev"
 }
 
 variable "limits" {

@@ -21,7 +21,7 @@ module "lb-http" {
   address        = google_compute_global_address.http_lb_address.address
 
   ssl                             = true
-  managed_ssl_certificate_domains = [var.domain]
+  managed_ssl_certificate_domains = ["${var.name}.${var.domain}"]
   https_redirect                  = true
 
   backends = {

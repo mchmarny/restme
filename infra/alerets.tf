@@ -22,7 +22,7 @@ resource "google_monitoring_uptime_check_config" "uptime_check" {
     type = "uptime_url"
     labels = {
       project_id = var.project_id
-      host       = var.domain
+      host       = "${var.name}.${var.domain}"
     }
   }
 }
