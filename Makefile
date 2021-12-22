@@ -1,7 +1,7 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.6.27
-TARGET_REGISTRY  ?=gcr.io
+RELEASE_VERSION  ?=v0.6.28
 SERVICE_URL      ?=https://restme.cloudylab.dev
+KO_DOCKER_REPO   ?=gcr.io/cloudy-labs
 
 all: help
 
@@ -41,21 +41,18 @@ verify: ## Runs verification test against the running service
 	test/endpoints $(SERVICE_URL)
 .PHONY: verify
 
-image: ## Creates container image using Cloud Build
-	gcloud builds submit \
-		--project $(PROJECT_ID) \
-		--tag "$(TARGET_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(RELEASE_VERSION)"
-.PHONY: tag
-
-sig: ## Creates container image using Cloud Build
+image: ## Creates container image using ko
+	KO_DOCKER_REPO=$(KO_DOCKER_REPO)/$(SERVICE_NAME) \
+	GOFLAGS="-ldflags=-X=main.version=$(RELEASE_VERSION)" \
+		ko publish ./cmd/ --bare --tags $(RELEASE_VERSION),latest
 	COSIGN_PASSWORD="" cosign sign \
 		--key cosign.key \
 		-a tag=$(RELEASE_VERSION) \
-		$(TARGET_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(RELEASE_VERSION)
+		$(KO_DOCKER_REPO)/$(SERVICE_NAME)
 	COSIGN_PASSWORD="" cosign verify \
 		--key cosign.pub \
-		$(TARGET_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(RELEASE_VERSION)
-.PHONY: sig
+		$(KO_DOCKER_REPO)/$(SERVICE_NAME)
+.PHONY: image
 
 tag: ## Creates release tag 
 	git tag $(RELEASE_VERSION)

@@ -1,3 +1,9 @@
+variable "org_id" {
+  description = "GCP Org ID"
+  type        = string
+  default     = "110572507568"
+}
+
 variable "project_id" {
   description = "GCP Project ID"
   type        = string

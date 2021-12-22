@@ -56,12 +56,22 @@ jobs:
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
+    - name: Install Ko
+      uses: imjasonh/setup-ko@v0.4
+      env:
+        KO_DOCKER_REPO: gcr.io/${{ secrets.PROJECT_ID }}
+      with:
+        version: tip
+        
     - name: Auth to GCP
       run: |
         gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
-        
+        gcloud auth print-access-token | ko login gcr.io --username=oauth2accesstoken --password-stdin
+
+
     - name: Publish Image
       run: |
-        gcloud builds submit \
-          --project ${{ secrets.PROJECT_ID }} \
-          --tag "gcr.io/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ env.RELEASE_VERSION }}"
+        KO_DOCKER_REPO=gcr.io/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }} \
+        GOFLAGS="-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}" \
+          ko publish ./cmd/ --bare --tags ${{ env.RELEASE_VERSION }},latest
+
