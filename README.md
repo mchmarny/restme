@@ -124,6 +124,8 @@ After the resources are applied to your GCP project, terraform wil return:
 * `publisher_account_email` (Service account `<name>-publisher@<project>.iam.gserviceaccount.com`)
 * workload_identity_pool_provider_id (`projects/<project_number>/locations/global/workloadIdentityPools/github-id-pool-restme/providers/github-provider-restme`)
 
+> I couldn't figure out how to apply the throttling and canary CVE policies in Cloud Armor using terraform. To apply these rules you will have to execute the [infra/patch/policy](infra/patch/policy) script.
+
 5. Validate the deployment 
 
 Use `curl` to access the value of `external_url` returned by the `terraform apply` command
