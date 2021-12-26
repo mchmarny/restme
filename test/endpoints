@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -euo pipefail
+
+readonly URL=$1
+
+test_get_endpoint() {
+    local url=$1
+    curl -i \
+         -H "Content-Type: application/json" \
+         $url
+    printf "\n"
+}
+
+test_echo_post() {
+    local url=$1
+    curl -i \
+         -H "Content-Type: application/json" \
+         $url -d@- <<EOF
+{
+    "on": $(date +%s),
+    "msg": "hello?"
+}
+EOF
+    printf "\n"
+}
+
+main() {
+    printf "Invoking '${URL}' GET endpoints...\n"
+    test_get_endpoint "${URL}/v1/request/info"
+
+    printf "Invoking '${URL}' POST endpoints...\n"
+    test_echo_post "${URL}/v1/echo/message"
+}
+
+main
+

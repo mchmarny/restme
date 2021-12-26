@@ -1,0 +1,102 @@
+name: Publish
+
+on:  
+  push:
+    tags:
+      - 'v*'
+  
+jobs:
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.17
+
+    - name: Cache Go Modules
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Tidy Modules
+      run: |
+        make tidy
+
+    - name: Config Lint
+      id: golangci_config
+      uses: andstor/file-existence-action@v1
+      with:
+        files: .golangci.yaml
+
+    - name: Lint Code
+      if: steps.golangci_config.outputs.files_exists == 'true'
+      uses: golangci/golangci-lint-action@v2
+      with:
+        version: latest
+        args: --timeout 3m
+
+    - name: Test Code
+      run: |
+        make test
+
+    - name: Capture Variables
+      run: |
+        echo "RELEASE_VERSION=$(make version)" >> $GITHUB_ENV
+        echo "SERVICE_NAME=$(make name)" >> $GITHUB_ENV
+
+    - id: auth
+      name: Get GCP token
+      uses: google-github-actions/auth@v0.4.4
+      with:
+          token_format: "access_token"
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+
+    - name: Install Ko
+      uses: imjasonh/setup-ko@v0.4
+      env:
+        KO_DOCKER_REPO: gcr.io/${{ secrets.PROJECT_ID }}
+      with:
+        version: tip
+        
+    - name: Login With ko
+      run: |
+        ko version
+        ko login gcr.io --username=oauth2accesstoken --password=${{ steps.auth.outputs.access_token }}
+
+    - name: Tidy Modules Again
+      run: |
+        make tidy
+
+    - name: Publish Image
+      run: |
+        ko publish ./cmd/ --bare --tags ${{ env.RELEASE_VERSION }},latest
+      env:
+        KO_DOCKER_REPO: gcr.io/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}
+        GOFLAGS: "-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}"
+
+    - name: Install Cosign
+      uses: sigstore/cosign-installer@main
+      with:
+        cosign-release: 'v1.4.1'
+
+    - name: Sign Image
+      run: |
+        cosign sign --oidc-issuer https://token.actions.githubusercontent.com ${TAGS}
+      env:
+        TAGS: gcr.io/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}
+        COSIGN_EXPERIMENTAL: 1
