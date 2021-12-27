@@ -40,6 +40,10 @@ verify: ## Runs verification test against the running service
 	test/endpoints $(SERVICE_URL)
 .PHONY: verify
 
+load: ## Runs throtteling test against the running service
+	for i in {1..30}; do curl -i $(SERVICE_URL)/v1/request/info; done
+.PHONY: load
+
 tag: ## Creates release tag 
 	git tag $(RELEASE_VERSION)
 	git push origin $(RELEASE_VERSION)
