@@ -44,7 +44,7 @@ resource "google_project_iam_member" "publisher_storage_role_binding" {
 # Identiy pool for GitHub action based identities access to Google Cloud resources
 resource "google_iam_workload_identity_pool" "github_pool" {
   provider                  = google-beta
-  workload_identity_pool_id = "github-id-pool-${var.name}"
+  workload_identity_pool_id = "github-${var.name}-pool"
 }
 
 # Configuration for GitHub identiy provider

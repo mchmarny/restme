@@ -22,7 +22,7 @@ provider "registry.terraform.io/hashicorp/google" {
 
 provider "registry.terraform.io/hashicorp/google-beta" {
   version     = "4.5.0"
-  constraints = ">= 3.53.0, < 5.0.0"
+  constraints = ">= 3.53.0, ~> 4.4, < 5.0.0"
   hashes = [
     "h1:umFITzEN9u2Cn1XW0Dl/EUY2SwqwqqbERVZubJlRRsk=",
     "zh:06bd1685e81f8d12ac50a673910e662624653f891177d04bb20e13d0a6c468c6",

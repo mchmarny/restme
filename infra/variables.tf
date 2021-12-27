@@ -9,7 +9,7 @@ variable "project_id" {
 variable "name" {
   description = "Service name"
   type        = string
-  nullable    = false
+  default     = "restme"
 }
 
 variable "domain" {
@@ -27,7 +27,7 @@ variable "image" {
 variable "regions" {
   description = "list of GPC regions to deploy to"
   type        = list(any)
-  nullable    = false
+  default     = ["us-west1", "europe-west1", "asia-east1"]
 }
 
 variable "alert_email" {

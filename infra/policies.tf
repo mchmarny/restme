@@ -1,6 +1,7 @@
 # Cloud Armor policies 
 # TODO: add cve-canary and throttle policies from infra/patch/policy 
 #       when they become available in google-beta provider
+
 resource "google_compute_security_policy" "policy" {
   name = "${var.name}-policy"
 
