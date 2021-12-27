@@ -1,5 +1,5 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.7.18
+RELEASE_VERSION  ?=v0.8.1
 SERVICE_URL      ?=https://restme.cloudylab.dev
 
 all: help

@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Cloud Armor Patch
-gcloud compute security-policies rules create 950 \
-    --action=deny-403 \
-    --security-policy=restme-policy \
-    --expression=evaluatePreconfiguredExpr\(\'cve-canary\'\) \
-    --description='CVE-2021-44228 and CVE-2021-45046'
-
 gcloud beta compute security-policies rules create 2000 \
     --security-policy=restme-policy \
     --expression="request.headers['host'] == 'restme.cloudylab.dev'" \
@@ -16,6 +9,13 @@ gcloud beta compute security-policies rules create 2000 \
     --conform-action=allow \
     --exceed-action=deny-429 \
     --enforce-on-key=IP
+
+# Cloud Armor Patch (already in rerraform)
+# gcloud compute security-policies rules create 950 \
+#     --action=deny-403 \
+#     --security-policy=restme-policy \
+#     --expression=evaluatePreconfiguredExpr\(\'cve-canary\'\) \
+#     --description='CVE-2021-44228 and CVE-2021-45046'
 
 # test throttle
 # for i in {1..100}; do curl -i https://restme.cloudylab.dev/v1/request/info; done

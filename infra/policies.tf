@@ -11,8 +11,19 @@ resource "google_compute_security_policy" "policy" {
 
 
   rule {
+    action      = "deny(403)"
+    description = "CVE-2021-44228 and CVE-2021-45046"
+    priority    = 950
+    match {
+      expr {
+        expression = "evaluatePreconfiguredExpr('cve-canary')"
+      }
+    }
+  }
+
+  rule {
     action   = "deny(403)"
-    priority = "1000"
+    priority = 1000
     match {
       versioned_expr = "SRC_IPS_V1"
       config {
@@ -24,7 +35,7 @@ resource "google_compute_security_policy" "policy" {
 
   rule {
     action   = "allow"
-    priority = "2147483647"
+    priority = 2147483647
     match {
       versioned_expr = "SRC_IPS_V1"
       config {
@@ -33,4 +44,5 @@ resource "google_compute_security_policy" "policy" {
     }
     description = "default rule"
   }
+
 }
