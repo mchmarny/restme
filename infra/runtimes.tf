@@ -5,7 +5,6 @@ resource "google_service_account" "runner_service_account" {
   display_name = "${var.name}-runner"
 }
 
-
 # Policy to allow access to secrets 
 data "google_iam_policy" "secret_reader" {
   binding {

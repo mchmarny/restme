@@ -89,7 +89,7 @@ resource "google_monitoring_alert_policy" "uptime_alert_policy" {
   }
 
   user_labels = {
-    uptime  = "uptime_check"
+    uptime = "uptime_check"
   }
 
   notification_channels = [

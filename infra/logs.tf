@@ -21,22 +21,21 @@ resource "google_storage_bucket" "logs_bucket" {
 }
 
 # Sink to drain Cloud Logs to the GCS bucket 
-resource "google_logging_project_sink" "run-log-sink" {
-  name        = "${var.name}-sink"
+resource "google_logging_project_sink" "run_log_sink" {
+  name        = "${var.name}-revision-sink"
   description = "Cloud Run logs"
   destination = "storage.googleapis.com/${google_storage_bucket.logs_bucket.name}"
   filter      = "resource.type = \"cloud_run_revision\" AND severity>=DEFAULT"
-
-  unique_writer_identity = true
+  unique_writer_identity = false
 }
 
 # IAM role binding to allow sink to write to GCS 
-resource "google_project_iam_binding" "log-writer" {
+resource "google_project_iam_binding" "log_writer" {
   project = var.project_id
   role    = "roles/storage.objectCreator"
 
   members = [
-    google_logging_project_sink.run-log-sink.writer_identity,
+    google_logging_project_sink.run_log_sink.writer_identity,
   ]
 
   lifecycle {
