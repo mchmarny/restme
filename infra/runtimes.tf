@@ -53,12 +53,12 @@ resource "google_cloud_run_service" "default" {
           value = var.image
         }
         env {
-          name  = "GIN_MODE"
-          value = "release"
+          name  = "REGION"
+          value = each.value
         }
         env {
           name  = "LOG_LEVEL"
-          value = "debug"
+          value = var.log_level
         }
         env {
           name = "API_KEY"

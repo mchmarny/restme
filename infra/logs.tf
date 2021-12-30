@@ -22,10 +22,10 @@ resource "google_storage_bucket" "logs_bucket" {
 
 # Sink to drain Cloud Logs to the GCS bucket 
 resource "google_logging_project_sink" "run_log_sink" {
-  name        = "${var.name}-revision-sink"
-  description = "Cloud Run logs"
-  destination = "storage.googleapis.com/${google_storage_bucket.logs_bucket.name}"
-  filter      = "resource.type = \"cloud_run_revision\" AND severity>=DEFAULT"
+  name                   = "${var.name}-revision-sink"
+  description            = "Cloud Run logs"
+  destination            = "storage.googleapis.com/${google_storage_bucket.logs_bucket.name}"
+  filter                 = "resource.type = \"cloud_run_revision\" AND severity>=DEFAULT"
   unique_writer_identity = false
 }
 

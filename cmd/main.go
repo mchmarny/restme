@@ -31,7 +31,7 @@ var (
 )
 
 func makeRouter(logger *log.Logger) *gin.Engine {
-	gin.ForceConsoleColor()
+	gin.SetMode(gin.ReleaseMode)
 
 	r := gin.New()
 	r.Use(gin.Recovery())

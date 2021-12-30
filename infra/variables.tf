@@ -36,6 +36,12 @@ variable "alert_email" {
   nullable    = false
 }
 
+variable "log_level" {
+  type        = string
+  description = "Level of logging to use in the container (e.g. panic, fatal, error, warn, info, debug, trace)"
+  default     = "info"
+}
+
 variable "service_limits" {
   type        = map(string)
   description = "Resource limits to the container"
@@ -92,7 +98,4 @@ variable "api_key" {
   description = "Secret version data for API key"
   default     = "test-value"
 }
-
-
-
 
