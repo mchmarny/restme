@@ -65,13 +65,14 @@ resource "google_monitoring_alert_policy" "ssl_cert_expire_alert_policy" {
 
 # Policy for the uptime check
 resource "google_monitoring_alert_policy" "uptime_alert_policy" {
+  provider = google-beta
   display_name = "Uptime alert policy"
   combiner     = "OR"
   conditions {
     display_name = "Failure of uptime check"
     condition_threshold {
-      filter          = format("metric.type=\"monitoring.googleapis.com/uptime_check/check_passed\" AND resource.type=\"uptime_url\" AND metric.label.\"check_id\"=\"%s\"", google_monitoring_uptime_check_config.uptime_check.id)
-      duration        = "0s"
+      filter          = format("metric.type=\"monitoring.googleapis.com/uptime_check/check_passed\" resource.type=\"uptime_url\" metric.label.\"check_id\"=\"%s\"", google_monitoring_uptime_check_config.uptime_check.id)
+      duration        = "180s"
       comparison      = "COMPARISON_GT"
       threshold_value = 1
       trigger {
@@ -93,8 +94,12 @@ resource "google_monitoring_alert_policy" "uptime_alert_policy" {
   }
 
   notification_channels = [
-    google_monitoring_notification_channel.notification_channel.id
+    google_monitoring_notification_channel.notification_channel.name
   ]
 
   depends_on = [google_monitoring_uptime_check_config.uptime_check]
+  documentation {
+    content = "This alert is created and managed by [terraform](infra/alerets.tf)"
+    mime_type = "text/markdown"
+  }
 }
