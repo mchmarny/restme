@@ -32,7 +32,7 @@ resource "google_logging_project_sink" "run_log_sink" {
 # IAM role binding to allow sink to write to GCS 
 resource "google_project_iam_binding" "log_writer" {
   project = var.project_id
-  role    = "roles/storage.objectCreator"
+  role    = "roles/storage.admin"
 
   members = [
     google_logging_project_sink.run_log_sink.writer_identity,

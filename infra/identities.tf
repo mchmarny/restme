@@ -51,6 +51,17 @@ resource "google_project_iam_binding" "publisher_storage_creator_binding" {
   ]
 }
 
+# IAM role binding to allow publisher view to GCS 
+resource "google_project_iam_binding" "publisher_storage_viewer_binding" {
+  project = var.project_id
+  role    = "roles/storage.objectViewer"
+
+  members = [
+    "serviceAccount:${google_service_account.publisher_service_account.email}",
+  ]
+}
+
+
 # Identiy pool for GitHub action based identities access to Google Cloud resources
 resource "google_iam_workload_identity_pool" "github_pool" {
   provider                  = google-beta
