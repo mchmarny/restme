@@ -172,15 +172,19 @@ cloud_run_services = toset([
 > Note, you will not be able to access these services yet since we annotated each one of the Cloud Run services with ingress (trigger) by internal and Cloud load balancer only. If you won't be using Cloud Load balancer (next step), you can remove the `"run.googleapis.com/ingress"` annotation in [runtimes.tf](infra/2-service/runtimes.tf) file. 
 
 ```json
-metadata {
-  labels = {
-    terraformed = "true"
+{
+  ...
+  metadata {
+    labels = {
+      terraformed = "true"
+    }
+    annotations = {
+      "autoscaling.knative.dev/maxScale" = var.service_max_scale
+      "run.googleapis.com/client-name"   = "terraform"
+      "run.googleapis.com/ingress"       = "internal-and-cloud-load-balancing"
+    }
   }
-  annotations = {
-    "autoscaling.knative.dev/maxScale" = var.service_max_scale
-    "run.googleapis.com/client-name"   = "terraform"
-    "run.googleapis.com/ingress"       = "internal-and-cloud-load-balancing"
-  }
+  ...
 }
 ```
 
