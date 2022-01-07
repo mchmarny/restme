@@ -1,7 +1,7 @@
 # GCS bucket to store exported logs
 resource "google_storage_bucket" "logs_bucket" {
   project                     = var.project_id
-  name                        = "${var.name}-logs"
+  name                        = "${var.project_id}-${var.name}-logs"
   location                    = "US"
   storage_class               = "STANDARD"
   uniform_bucket_level_access = true

@@ -1,6 +1,7 @@
 SERVICE_NAME     ?=restme
-RELEASE_VERSION  ?=v0.8.5
+RELEASE_VERSION  ?=v0.8.6
 SERVICE_URL      ?=https://restme.cloudylab.dev
+KO_DOCKER_REPO   ?=gcr.io/cloudy-lab2
 
 all: help
 
@@ -43,6 +44,12 @@ verify: ## Runs verification test against the running service
 load: ## Runs throtteling test against the running service
 	for i in {1..30}; do curl -i $(SERVICE_URL)/v1/request/info; done
 .PHONY: load
+
+image: tidy ## Builds and publish image using ko
+	KO_DOCKER_REPO=$(KO_DOCKER_REPO)/$(SERVICE_NAME) \
+	GOFLAGS="-ldflags=-X=main.version=$(RELEASE_VERSION)" \
+		ko publish ./cmd --bare --tags $(RELEASE_VERSION),latest
+.PHONY: image
 
 tag: ## Creates release tag 
 	git tag $(RELEASE_VERSION)
