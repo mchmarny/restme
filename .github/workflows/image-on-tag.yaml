@@ -68,8 +68,6 @@ jobs:
 
     - name: Install Ko
       uses: imjasonh/setup-ko@v0.4
-      env:
-        KO_DOCKER_REPO: gcr.io/${{ secrets.PROJECT_ID }}
       with:
         version: tip
         
@@ -84,7 +82,7 @@ jobs:
 
     - name: Publish Image
       run: |
-        ko publish ./cmd/ --bare --tags ${{ env.RELEASE_VERSION }},latest
+        ko build ./cmd/ --image-refs ./image-digest --bare --tags ${{ env.RELEASE_VERSION }},latest
       env:
         KO_DOCKER_REPO: gcr.io/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}
         GOFLAGS: "-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}"
@@ -96,7 +94,6 @@ jobs:
 
     - name: Sign Image
       run: |
-        cosign sign --oidc-issuer https://token.actions.githubusercontent.com ${TAGS}
+        cosign sign $(cat ./image-digest)
       env:
-        TAGS: gcr.io/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}
         COSIGN_EXPERIMENTAL: 1

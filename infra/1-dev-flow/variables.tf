@@ -6,4 +6,10 @@ variable "project_id" {
   nullable    = false
 }
 
+variable "repo" {
+  description = "GitHub Repo"
+  type        = string
+  nullable    = false
+}
+
 
