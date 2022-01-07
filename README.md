@@ -2,32 +2,37 @@
 
 Template to bootstrap a fully functional, multi-region, REST service on GCP with a developer release pipeline.
 
-## Provisioned Infrastructure
+## Provisioned
 
-* HTTPS Load Balancer configured with:
-  * Custom domain
+List of resources provisioned using this project 
+
+### Development Flow 
+
+* Container registry (GCR) to store images
+* Service account to use for image publishing from GitHub to GCR
+* Workload identity pool provider for GitHub Action workflows to access GCR without the needing to store the GCP credentials as long-lived GitHub secrets
+
+### Cloud Run Service 
+
+Cloud Run service provisioned into n-number of regions with: 
+  
+* Custom identity (service account)
+* Custom capacity and autoscaling strategy 
+* Accessible only via Internal and Load Balancer traffic (i.e. no external access)
+* Secret Manager service with sample secret 
+* Revision config using secret variable
+
+### Cloud Load Balancer
+
+HTTPS load balancer configured with:
+
   * External IP
   * SSL certificate
-  * Throttling and Canary CVE policies
-  * Serverless NEGs
-* Cloud Run service load balanced across 3 regions with:
-  * Custom identity (service account)
-  * Cloud Secrets variable
-  * Custom capacity and autoscaling strategy 
-  * Internal and Load Balancer traffic only trigger (no external access)
-  * Container registry 
-* Project configuration for:
+  * Cloud DNS service with A record for custom domain
+  * Cloud Armor service with throttling and Canary CVE policies
+  * Serverless NEGs for load balancer to point to Cloud Run service in each region
   * Service uptime and SSL cert expiration alerts
-  * Workload identity pool provider for GitHub Actions
   
-## Development Workflow 
-
-* Local test, lint, and validate actions using Makefile
-* GitHub Actions for:
-  * Test workflow on each PR
-  * Image publishing to GCR and signing workflow on git tag
-
-
 ## REST Services
 
 Go code exposing following routes:
@@ -81,7 +86,7 @@ Response:
 { "on": 1620438323, "msg": "hello?" }
 ```
 
-## Deployment 
+## Deployment
 
 ### Prerequisites 
 
@@ -90,56 +95,153 @@ Response:
 * [terraform CLI](https://www.terraform.io/downloads)
 * [GCP Project](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
 * [gcloud CLI](https://cloud.google.com/sdk/gcloud)
+  * Make sure to authenticate to GCP using `gcloud auth application-default login`
 
-### Deployment
+## Development Flow Deployment
 
-1. Update [terraform variables](infra/variables.tf) with your project ID, domain name, email address etc.
+1. In terminal, from the root of the project, `cd infra/1-dev-flow`
 
-2. Authenticate to GCP using `gcloud`:
+2. Initialize terraform
 
-```shell
-gcloud auth application-default login
-```
-
-3. Initialize terraform:
+> Note, this flow uses local terraform state, make sure you do not check that into source control and consider using persistent state provider like GCS
 
 ```shell
 terraform init
 ```
 
-4. Apply the configuration
+3. Apply the configuration
 
-> Review the displayed plan returned by terraform answering `yes`
+> When promoted for the `GCP Project ID`, enter your existing project code and confirm with `yes` the terraform displayed plan
 
 ```sh
 terraform apply
 ```
 
-> This will prompt you to provide values for each one of the defined variables. Alternatively, you can either define an environment file (e.g. `terraform.tfvars` in the same directory or pass the `-var-file` flag. (e.g. `terraform plan -var-file="envs/prod.tfvars"`).
+4. Create GitHub Secrets 
 
-After the resources are applied to your GCP project, terraform wil return: 
+The result of the `apply` command above will look something like this: 
 
-* `external_url` (IP and HTTPS address) 
-* `publisher_account_email` (Service account `<name>-publisher@<project>.iam.gserviceaccount.com`)
-* workload_identity_pool_provider_id (`projects/<project_number>/locations/global/workloadIdentityPools/github-id-pool-restme/providers/github-provider-restme`)
+```shell
+PROJECT_ID = "<id-of-your-project>"
+SERVICE_ACCOUNT = "github-action-publisher@<id-of-your-project>.iam.gserviceaccount.com"
+WORKLOAD_IDENTITY_PROVIDER = "projects/<number-of-your-project>/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+```
 
-> I couldn't figure out how to apply the throttling and canary CVE policies in Cloud Armor using terraform. To apply these rules you will have to execute the [infra/patch/policy](infra/patch/policy) script.
+Navigate to your GitHub project [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) and create the following entries with the values returned by the apply command: 
 
-5. Validate the deployment 
+* `PROJECT_ID`
+* `SERVICE_ACCOUNT`
+* `WORKLOAD_IDENTITY_PROVIDER`
 
-Use `curl` to access the value of `external_url` returned by the `terraform apply` command
+Now, whenever you create a version tag (`v*`) in your repo, GitHub will run the [image-on-tag.yaml](.github/workflows/image-on-tag.yaml) action which will build, publish, and sign (using cosign) your container image in GCR. 
 
-### GitHub project configuration 
+## Cloud Run Service Deployment
 
-Create [GitHub secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) in your project for: 
+> This assumes an already published image in GCR
 
-* `PROJECT_ID` with the ID (not name) of your GCP project
-* `SERVICE_ACCOUNT` with value of `publisher_account_email` returned by `terraform apply` command
-* `WORKLOAD_IDENTITY_PROVIDER` with value of `workload_identity_pool_provider_id` also returned by `terraform apply` command
+1. In terminal, from the root of the project, `cd infra/2-service`
 
-Now, whenever you run `make tag` locally, the `Publish` action will be triggered on GitHub and a new image will be published to GCR in your project. 
+2. Initialize terraform
+
+> Note, this flow uses local terraform state, make sure you do not check that into source control and consider using persistent state provider like GCS
+
+```shell
+terraform init
+```
+
+3. Apply the configuration
+
+> For this demo, the [variables.tf](infra/2-service/variables.tf) file includes a lot of default values (like for example the list of regions to deploy to). Edit these as necessary. 
+
+```sh
+terraform apply
+```
+
+> This will prompt you to provide values for `project_id` and `image` (this is the previously published container image in GCR, the value should be in `gcr.io/<your-project-id>/restme:<tag-version>` format). Alternatively, you can define an environment file (e.g. `terraform.tfvars` in the same directory or pass the `-var-file` flag. (e.g. `terraform plan -var-file="envs/prod.tfvars"`). When promoted to confirm the plan, type `yes`.
+
+The result of `apply` should be a list of Cloud Run services (URLs) for each one of the regions you deployed to. 
+
+```shell
+cloud_run_services = toset([
+  "https://restme--asia-east1-4qt7uwb6vq-de.a.run.app",
+  "https://restme--europe-west1-4qt7uwb6vq-ew.a.run.app",
+  "https://restme--us-west1-4qt7uwb6vq-uw.a.run.app",
+])
+```
+
+> Note, you will not be able to access these services yet since we annotated each one of the Cloud Run services with ingress (trigger) by internal and Cloud load balancer only. If you won't be using Cloud Load balancer (next step), you can remove the `"run.googleapis.com/ingress"` annotation in [runtimes.tf](infra/2-service/runtimes.tf) file. 
+
+```json
+metadata {
+  labels = {
+    terraformed = "true"
+  }
+  annotations = {
+    "autoscaling.knative.dev/maxScale" = var.service_max_scale
+    "run.googleapis.com/client-name"   = "terraform"
+    "run.googleapis.com/ingress"       = "internal-and-cloud-load-balancing"
+  }
+}
+```
+
+### Cloud Load Balancer Deployment
+
+> This assumes an already deployed Cloud Run services 
+
+1. In terminal, from the root of the project, `cd infra/3-network`
+
+2. Initialize terraform
+
+> Note, this flow uses local terraform state, make sure you do not check that into source control and consider using persistent state provider like GCS
+
+```shell
+terraform init
+```
+
+3. Apply the configuration
+
+> For this demo, the [variables.tf](infra/3-network/variables.tf) file includes a lot of default values (like for example the list of regions to deploy to). Edit these as necessary.
+
+```sh
+terraform apply
+```
+
+> This will prompt you to provide values for `project_id` and `domain` (this is full domain that will be used in the SSL cert), and `alert_email` where the alerts will be sent. 
+
+The result of `apply` should be the external IP address (`external_ip`) and the load balanced URL (`external_url`). Make sure the domain you provided in `apply` points to that IP. 
+
+4. Apply manual policies 
+
+The Google Cloud provider is still missing some of the new Cloud Armor policy types so to apply the throttling policy you will have to create it manually. 
+
+```shell
+patch/policy
+```
+
+> Note, the SSL cert provisioning in the above action will take a few min. 
+
+Assuming everything went OK, you should now be able to test the deployment by using `curl` to invoke the address returned by the `external_url` output
+
+```shell
+url https://restme.<your-domain>.dev/
+```
+
+Should rerun something like this:
+
+```json
+{
+    "routes": [
+        "POST    /v1/echo/message",
+        "GET     /v1/request/info"
+    ]
+}
+```
 
 ## Clean up
+
+To clean up each of these deployments run the following command:
+
+> Note, the project itself and the external IP address will not be deleted and all APIs enabled as part of these deployments will stay enabled. 
 
 ```sh
 terraform destroy

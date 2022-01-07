@@ -25,3 +25,7 @@ override.tf.json
 *_override.tf.json
 .terraformrc
 terraform.rc
+
+# Teraform Demo 
+.terraform
+.terraform.lock.hcl
