@@ -53,7 +53,7 @@ Go code exposing following routes:
       "path": "/v1/request",
       "protocol": "HTTP/1.1",
       "time": "2021-05-09T15:42:29.682509631Z",
-      "version": "v0.3.1"
+      "version": "v0.8.11"
   },
   "headers": {
       "accept": "*/*",
@@ -240,6 +240,8 @@ Should rerun something like this:
     ]
 }
 ```
+
+You can also `curl` the `/v1/request/info` API which should return (among many other things), the image version used in Cloud Run service. 
 
 ## Clean up
 
