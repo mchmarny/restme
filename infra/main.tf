@@ -28,7 +28,6 @@ resource "google_project_service" "default" {
 
   timeouts {
     create = "10m"
-    update = "20m"
   }
   
   disable_on_destroy = false

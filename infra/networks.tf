@@ -54,6 +54,10 @@ module "lb-http" {
 
     }
   }
+
+  depends_on = [
+    google_compute_global_address.http_lb_address,
+  ]
 }
 
 # Region network endpoint group for Cloud Run sercice in that region

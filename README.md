@@ -15,10 +15,9 @@ Template to bootstrap a fully functional, multi-region, REST service on GCP with
   * Cloud Secrets variable
   * Custom capacity and autoscaling strategy 
   * Internal and Load Balancer traffic only trigger (no external access)
-* Project configuration for:
-  * Logging with GCS bucket sink 
-  * Service uptime and SSL cert expiration alerts
   * Container registry 
+* Project configuration for:
+  * Service uptime and SSL cert expiration alerts
   * Workload identity pool provider for GitHub Actions
   
 ## Development Workflow 
