@@ -111,7 +111,7 @@ terraform init
 
 3. Apply the configuration
 
-> When promoted for the `GCP Project ID`, enter your existing project code and confirm with `yes` the terraform displayed plan
+> When promoted for the `GCP Project ID`, enter your existing project code, `GitHub Repo` name, and confirm with `yes` the terraform displayed plan
 
 ```sh
 terraform apply
