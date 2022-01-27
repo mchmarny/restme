@@ -32,6 +32,17 @@ resource "google_compute_security_policy" "policy" {
     }
     description = "Deny access to IPs in 9.9.9.0/24"
   }
+  
+  rule {
+    action      = "deny(403)"
+    description = "Common DNS sniffing targets"
+    priority    = 1200
+    match {
+      expr {
+        expression = "request.path.matches('/Autodiscover|/bin/|/ecp/|/owa/|/vendor/|/ReportServer|/_ignition')"
+      }
+    }
+  }
 
   rule {
     action   = "allow"
