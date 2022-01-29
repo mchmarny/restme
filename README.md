@@ -170,6 +170,7 @@ regions        = ["us-west1", "europe-west1", "asia-east1"]
 image          = "restme"
 secret_version = "latest"
 log_level      = "info"
+alert_email    = "you@domain.com"
 ```
 
 > Note, the domain must be something you can control DNS for as you will have to create an `A` entry to point to the `IP` in Terraform output for this step. 

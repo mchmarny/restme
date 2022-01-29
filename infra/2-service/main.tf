@@ -12,10 +12,10 @@ locals {
     "servicecontrol.googleapis.com",
     "servicemanagement.googleapis.com",
     "servicenetworking.googleapis.com",
+    "stackdriver.googleapis.com",
     "storage-api.googleapis.com",
   ]
 }
-
 
 resource "google_project_service" "default" {
   for_each = toset(local.services)

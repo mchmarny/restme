@@ -41,3 +41,9 @@ variable "secret_version" {
   description = "the version of secret Cloud Run should use"
   default     = "latest"
 }
+
+variable "alert_email" {
+  type        = string
+  description = "Email address to which alerts will be sent"
+  nullable    = false
+}
