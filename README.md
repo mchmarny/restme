@@ -142,113 +142,71 @@ git tag v0.0.1
 git push origin v0.0.1
 ```
 
+Once the action completes, you should see the new image in GCR (`gcr.io/<project_id>/restme:v0.0.1`).
+
 ## Cloud Run Service Deployment
 
 > This assumes an already published image in GCR
 
-1. In terminal, from the root of the project, `cd infra/2-service`
-
-2. Initialize terraform
+1. Initialize terraform
 
 > Note, this flow uses local terraform state, make sure you do not check that into source control and consider using persistent state provider like GCS
 
+The service deployment step uses few new Terraform modules, so start by initializing the deployment. 
+
 ```shell
-terraform init
+terraform -chdir=infra/2-service init --upgrade
 ```
 
-3. Apply the configuration
+2. Apply the configuration
 
-> For this demo, the [variables.tf](infra/2-service/variables.tf) file includes a lot of default values (like for example the list of regions to deploy to). Edit these as necessary. 
+This deployment will prompt for a lot of variables, you can create `variables.tf` with the following entries in `infra/2-service` folder to avoid these prompts. Edit these as necessary. 
+
+```txt
+project_id     = "your-project-id"
+name           = "restme"
+domain         = "your.domain.dev"
+regions        = ["us-west1", "europe-west1", "asia-east1"]
+image          = "restme"
+secret_version = "latest"
+log_level      = "info"
+```
+
+> Note, the domain must be something you can control DNS for as you will have to create an `A` entry to point to the `IP` in Terraform output for this step. 
+
 
 ```sh
-terraform apply
+terraform -chdir=infra/2-service apply -var-file=terraform.tfvars
 ```
 
-> This will prompt you to provide values for `project_id` and `image` (this is the previously published container image in GCR, the value should be in `gcr.io/<your-project-id>/restme:<tag-version>` format). Alternatively, you can define an environment file (e.g. `terraform.tfvars` in the same directory or pass the `-var-file` flag. (e.g. `terraform plan -var-file="envs/prod.tfvars"`). When promoted to confirm the plan, type `yes`.
+The result of `apply` should be a list of Cloud Run services (URLs) for each one of the regions you deployed to, as well as the external IP and URL on the load balancer by which you can access these services. 
 
-The result of `apply` should be a list of Cloud Run services (URLs) for each one of the regions you deployed to. 
+> Note, you will not be able to access the Cloud Run services directly as their ingress (trigger) is internal and Cloud load balancer only. 
 
 ```shell
 cloud_run_services = toset([
-  "https://restme--asia-east1-4qt7uwb6vq-de.a.run.app",
-  "https://restme--europe-west1-4qt7uwb6vq-ew.a.run.app",
-  "https://restme--us-west1-4qt7uwb6vq-uw.a.run.app",
+  "https://restme--asia-east1-fr3j36toba-de.a.run.app",
+  "https://restme--europe-west1-fr3j36toba-ew.a.run.app",
+  "https://restme--us-west1-fr3j36toba-uw.a.run.app",
 ])
+external_ip = "x.x.x.x"
+external_url = "https://your.domain.dev/"
 ```
 
-> Note, you will not be able to access these services yet since we annotated each one of the Cloud Run services with ingress (trigger) by internal and Cloud load balancer only. If you won't be using Cloud Load balancer (next step), you can remove the `"run.googleapis.com/ingress"` annotation in [runtimes.tf](infra/2-service/runtimes.tf) file. 
+It will take a few min for the SSL certificate to be provisioned. As soon as the `apply` step completes, use the IP in `external_ip` to create an `A` record in your DNS to point to the domain in `external_url`. For example: 
 
-```json
-{
-  ...
-  metadata {
-    labels = {
-      terraformed = "true"
-    }
-    annotations = {
-      "autoscaling.knative.dev/maxScale" = var.service_max_scale
-      "run.googleapis.com/client-name"   = "terraform"
-      "run.googleapis.com/ingress"       = "internal-and-cloud-load-balancing"
-    }
-  }
-  ...
-}
-```
-
-### Cloud Load Balancer Deployment
-
-> This assumes an already deployed Cloud Run services 
-
-1. In terminal, from the root of the project, `cd infra/3-network`
-
-2. Initialize terraform
-
-> Note, this flow uses local terraform state, make sure you do not check that into source control and consider using persistent state provider like GCS
-
-```shell
-terraform init
-```
-
-3. Apply the configuration
-
-> For this demo, the [variables.tf](infra/3-network/variables.tf) file includes a lot of default values (like for example the list of regions to deploy to). Edit these as necessary.
-
-```sh
-terraform apply
-```
-
-> This will prompt you to provide values for `project_id` and `domain` (this is full domain that will be used in the SSL cert), and `alert_email` where the alerts will be sent. 
-
-The result of `apply` should be the external IP address (`external_ip`) and the load balanced URL (`external_url`). Make sure the domain you provided in `apply` points to that IP. 
-
-4. Apply manual policies 
-
-The Google Cloud provider is still missing some of the new Cloud Armor policy types so to apply the throttling policy you will have to create it manually. 
-
-```shell
-patch/policy
-```
+Host Name: `demo` # the `your` portion of `your.domain.dev`
+Type: `A`
+TTL: `60`
+Data: `x.x.x.x` # the actual IP returned by the above step
 
 > Note, the SSL cert provisioning in the above action will take a few min. 
 
 Assuming everything went OK, you should now be able to test the deployment by using `curl` to invoke the address returned by the `external_url` output
 
 ```shell
-url https://restme.<your-domain>.dev/
+url https://your.domain.dev/
 ```
-
-Should rerun something like this:
-
-```json
-{
-    "routes": [
-        "POST    /v1/echo/message",
-        "GET     /v1/request/info"
-    ]
-}
-```
-
-You can also `curl` the `/v1/request/info` API which should return (among many other things), the image version used in Cloud Run service. 
 
 ## Clean up
 
@@ -257,6 +215,7 @@ To clean up each of these deployments run the following command:
 > Note, the project itself and the external IP address will not be deleted and all APIs enabled as part of these deployments will stay enabled. 
 
 ```sh
-terraform destroy
+terraform -chdir=infra/2-service destroy
+terraform -chdir=infra/1-dev-flow destroy
 ```
 

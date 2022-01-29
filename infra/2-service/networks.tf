@@ -10,7 +10,7 @@ module "lb-http" {
   address        = google_compute_global_address.http_lb_address.address
 
   ssl                             = true
-  managed_ssl_certificate_domains = ["${var.name}.${var.domain}"]
+  managed_ssl_certificate_domains = ["${var.domain}"]
   https_redirect                  = true
 
   backends = {
@@ -46,7 +46,6 @@ module "lb-http" {
     google_project_service.default["compute.googleapis.com"],
     google_compute_global_address.http_lb_address,
   ]
-
 }
 
 # Region network endpoint group for Cloud Run sercice in that region
@@ -55,9 +54,9 @@ resource "google_compute_region_network_endpoint_group" "serverless_neg" {
 
   name                  = "${var.name}--neg--${each.key}"
   network_endpoint_type = "SERVERLESS"
-  region                = data.google_cloud_run_service.default[each.key].location
+  region                = google_cloud_run_service.default[each.key].location
 
   cloud_run {
-    service = data.google_cloud_run_service.default[each.key].name
+    service = google_cloud_run_service.default[each.key].name
   }
 }

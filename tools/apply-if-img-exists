@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -u
+set -e
+
+prj=$1
+tag=$2
+
+actual_tag=$(gcloud container images list-tags \
+				--filter="tags:$tag" \
+				--format=json gcr.io/$prj/restme)
+
+printf "Tags:\n"
+printf "   app   : %s\n" $(echo $actual_tag | jq -r '.[0].digest')
+printf "\n"
+
+if [[ "$actual_tag" == "[]" ]]; then
+  printf "Image tag does not exist, aborting\n"
+  exit 1
+fi
+
+
+printf "\nApplying terraform..."
+# don't use -auto-approve for now until this settles down
+terraform -chdir=./infra/1-dev-flow apply
+
+
+

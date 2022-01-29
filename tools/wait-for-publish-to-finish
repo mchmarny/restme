@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -u
+set -e
+
+user="mchmarny"
+repo="restme"
+token=$GITHUB_TOKEN
+
+echo "Waiting for GitHub workflow to start..."
+sleep 5
+
+s=""
+while [ "$s" !=	"completed" ]
+do
+	sleep 3
+  	s=$(curl -s -H "Accept: application/vnd.github.v3+json" -H "Authorization: token $token" https://api.github.com/repos/$user/$repo/actions/runs | jq -r '[.workflow_runs[] | select(.name == "publish")] | .[0].status')
+	echo "Status: $s"
+done
+
+
+c=$(curl -s -H "Accept: application/vnd.github.v3+json" -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/$user/$repo/actions/runs | jq -r '[.workflow_runs[] | select(.name == "publish")] | .[0].conclusion')
+
+if [ "$c" != "success" ]
+then
+	echo "Publish failed. See github logs for details:"
+	echo "https://github.com/$user/$repo/actions/workflows/image-on-tag.yaml"
+	exit 1
+fi

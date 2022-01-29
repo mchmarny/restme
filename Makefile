@@ -34,9 +34,13 @@ verify: ## Runs verification test against the running service
 	test/endpoints $(SERVICE_URL)
 .PHONY: verify
 
-dev-flow: ## Sets up developer loop (gh, gcr, oidc)
-	terraform -chdir=./infra/1-dev-flow apply
-.PHONY: dev-flow
+infra1: ## Sets up developer loop (gh, gcr, oidc)
+	terraform -chdir=infra/1-dev-flow apply -var-file=terraform.tfvars
+.PHONY: infra1
+
+infra2: ## Sets up serving (run, secret)
+	terraform -chdir=infra/2-service apply -var-file=terraform.tfvars
+.PHONY: infra2
 
 tag: ## Creates release tag 
 	git tag $(RELEASE_VERSION)

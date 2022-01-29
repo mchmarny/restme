@@ -3,4 +3,3 @@
 data "template_file" "version" {
   template = file("../../version")
 }
-

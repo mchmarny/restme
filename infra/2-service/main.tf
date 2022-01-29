@@ -2,6 +2,8 @@
 
 locals {
   services = [
+    "compute.googleapis.com",
+    "dns.googleapis.com",
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "monitoring.googleapis.com",
@@ -9,6 +11,8 @@ locals {
     "secretmanager.googleapis.com",
     "servicecontrol.googleapis.com",
     "servicemanagement.googleapis.com",
+    "servicenetworking.googleapis.com",
+    "storage-api.googleapis.com",
   ]
 }
 
@@ -22,7 +26,7 @@ resource "google_project_service" "default" {
   timeouts {
     create = "10m"
   }
-  
+
   disable_on_destroy = false
 }
 

@@ -24,7 +24,8 @@ resource "google_secret_manager_secret_iam_policy" "api_key_secret_access_policy
   policy_data = data.google_iam_policy.secret_reader.policy_data
 }
 
-# Cloud Run service to be deployed in each region
+
+# App Cloud Run service 
 resource "google_cloud_run_service" "default" {
   for_each = toset(var.regions)
 
@@ -36,55 +37,61 @@ resource "google_cloud_run_service" "default" {
   template {
     spec {
       containers {
-        image = "${var.app_image}:${data.template_file.version.rendered}"
+        image = "gcr.io/${var.project_id}/${var.image}:${data.template_file.version.rendered}"
+        volume_mounts {
+          name       = "config-secret"
+          mount_path = "/secrets"
+        }
         ports {
-          name           = var.service_ports["name"]
-          container_port = var.service_ports["port"]
+          name           = "http1"
+          container_port = 8080
         }
         resources {
-          limits = var.service_limits
+          limits = {
+            cpu    = "1000m"
+            memory = "512Mi"
+          }
         }
         env {
           name  = "ADDRESS"
-          value = ":${var.service_ports["port"]}"
-        }
-        env {
-          name  = "IMAGE"
-          value = var.image
-        }
-        env {
-          name  = "REGION"
-          value = each.value
+          value = ":8080"
         }
         env {
           name  = "LOG_LEVEL"
           value = var.log_level
         }
         env {
-          name = "API_KEY"
-          value_from {
-            secret_key_ref {
-              name = google_secret_manager_secret.secret_api_key.secret_id
-              key  = "latest"
-            }
+          name  = "CONFIG"
+          value = "/secrets/${var.name}"
+        }
+      }
+      volumes {
+        name = "config-secret"
+        secret {
+          secret_name = google_secret_manager_secret.secret_api_key.secret_id
+          items {
+            key  = var.secret_version
+            path = var.name
           }
         }
       }
 
-      container_concurrency = var.service_concurrency
-      timeout_seconds       = var.service_timeout
+      container_concurrency = 80
+      timeout_seconds       = 120
       service_account_name  = google_service_account.runner_service_account.email
+    }
+    metadata {
+      annotations = {
+        "autoscaling.knative.dev/maxScale" = "10"
+      }
     }
   }
 
   metadata {
-    labels = {
-      terraformed = "true"
-    }
     annotations = {
-      "autoscaling.knative.dev/maxScale" = var.service_max_scale
-      "run.googleapis.com/client-name"   = "terraform"
-      "run.googleapis.com/ingress"       = "internal-and-cloud-load-balancing"
+      "run.googleapis.com/client-name" = "terraform"
+      "run.googleapis.com/ingress"     = "internal-and-cloud-load-balancing"
+      # all, internal, internal-and-cloud-load-balancing
     }
   }
 
