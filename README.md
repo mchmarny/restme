@@ -35,7 +35,7 @@ HTTPS load balancer configured with:
   
 ## REST Services
 
-Go code exposing following routes:
+Go code exposing following sample services:
 
 * [Request info](#getv1requestinfo) - client request, headers and environment variables 
 * [Echo message](#postv1echomessage) - simple echo message 
@@ -99,25 +99,23 @@ Response:
 
 ## Development Flow Deployment
 
-1. In terminal, from the root of the project, `cd infra/1-dev-flow`
-
-2. Initialize terraform
+1. In terminal, from the root of the project, first initialize terraform
 
 > Note, this flow uses local terraform state, make sure you do not check that into source control and consider using persistent state provider like GCS
 
 ```shell
-terraform init
+terraform -chdir=infra/1-dev-flow init
 ```
 
-3. Apply the configuration
+2. Apply the configuration
 
-> When promoted for the `GCP Project ID`, enter your existing project code, `GitHub Repo` name, and confirm with `yes` the terraform displayed plan
+> When promoted for the `GCP Project ID`, enter your existing project code, `GitHub Repo` name, and confirm with `yes` the terraform displayed plan. Alternatively you can use either the command-line variables or a terraform variable file. More on that [here](https://www.terraform.io/language/values/variables).
 
 ```sh
-terraform apply
+terraform -chdir=infra/1-dev-flow apply
 ```
 
-4. Create GitHub Secrets 
+3. Create GitHub Secrets 
 
 The result of the `apply` command above will look something like this: 
 
@@ -133,7 +131,17 @@ Navigate to your GitHub project [secrets](https://docs.github.com/en/actions/sec
 * `SERVICE_ACCOUNT`
 * `WORKLOAD_IDENTITY_PROVIDER`
 
+4. Test GitHub Workflow 
+
 Now, whenever you create a version tag (`v*`) in your repo, GitHub will run the [image-on-tag.yaml](.github/workflows/image-on-tag.yaml) action which will build, publish, and sign (using cosign) your container image in GCR. 
+
+> Assuming you have not already created a git tag with this version
+
+```shell
+# $(shell cat version)
+git tag v0.8.17
+git push origin v0.8.17
+```
 
 ## Cloud Run Service Deployment
 
