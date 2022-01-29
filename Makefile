@@ -38,7 +38,7 @@ infra1: ## Sets up developer loop (gh, gcr, oidc)
 	terraform -chdir=infra/1-dev-flow apply -var-file=terraform.tfvars
 .PHONY: infra1
 
-infra2: ## Sets up serving (run, secret)
+infra2: ## Sets up serving (run, secret, policy, monitorng)
 	terraform -chdir=infra/2-service apply -var-file=terraform.tfvars
 .PHONY: infra2
 
