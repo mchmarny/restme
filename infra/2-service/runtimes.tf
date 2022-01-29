@@ -36,7 +36,7 @@ resource "google_cloud_run_service" "default" {
   template {
     spec {
       containers {
-        image = var.image
+        image = "${var.app_image}:${data.template_file.version.rendered}"
         ports {
           name           = var.service_ports["name"]
           container_port = var.service_ports["port"]

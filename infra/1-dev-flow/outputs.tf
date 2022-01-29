@@ -6,7 +6,7 @@ output "PROJECT_ID" {
 }
 
 output "SERVICE_ACCOUNT" {
-  value       = google_service_account.publisher_service_account.email
+  value       = google_service_account.github_actions_user.email
   description = "Service account to use in GitHub Action for federated auth."
 }
 

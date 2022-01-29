@@ -1,4 +1,4 @@
-name: Test
+name: test
 
 on:
   push:
@@ -33,17 +33,6 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 2
-
-    - name: Init CodeQL
-      uses: github/codeql-action/init@v1
-      with:
-        languages: go
-    
-    - name: CodeQL Build
-      uses: github/codeql-action/autobuild@v1
-    
-    - name: CodeQL Analyze
-      uses: github/codeql-action/analyze@v1
 
     - name: Tidy Modules
       run: |

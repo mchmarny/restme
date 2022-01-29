@@ -16,17 +16,17 @@ resource "google_container_registry" "registry" {
 }
 
 # Service account to be used for federated auth to publish to GCR
-resource "google_service_account" "publisher_service_account" {
-  account_id   = "github-action-publisher"
-  display_name = "GitHub Action Publisher Service Account"
+resource "google_service_account" "github_actions_user" {
+  account_id   = "github-actions-user"
+  display_name = "Service Account impersonated in GitHub Actions"
 }
 
 # Role binding to allow publisher to publish images
-resource "google_project_iam_member" "publisher_storage_role_binding" {
+resource "google_project_iam_member" "github_actions_user_storage_role_binding" {
   for_each = local.publisher_roles
   project  = var.project_id
   role     = each.value
-  member   = "serviceAccount:${google_service_account.publisher_service_account.email}"
+  member   = "serviceAccount:${google_service_account.github_actions_user.email}"
 }
 
 # Default GCR bucket policy in GCS
@@ -34,7 +34,7 @@ data "google_iam_policy" "gcr_bucket_policy" {
   binding {
     role = "roles/storage.legacyBucketReader"
     members = [
-      "serviceAccount:${google_service_account.publisher_service_account.email}",
+      "serviceAccount:${google_service_account.github_actions_user.email}",
     ]
   }
 }
@@ -64,14 +64,15 @@ resource "google_iam_workload_identity_pool_provider" "github_provider" {
     "attribute.repository" = "assertion.repository"
   }
   oidc {
-    issuer_uri = "https://token.actions.githubusercontent.com"
+    issuer_uri        = "https://token.actions.githubusercontent.com"
+    allowed_audiences = []
   }
 }
 
 # IAM policy bindings to the service account resources created by GitHub identify
 resource "google_service_account_iam_member" "pool_impersonation" {
   provider           = google-beta
-  service_account_id = google_service_account.publisher_service_account.id
+  service_account_id = google_service_account.github_actions_user.id
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.repo}"
+  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.git_repo}"
 }

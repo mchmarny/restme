@@ -1,17 +1,16 @@
-name: Publish
+name: publish
 
 on:  
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
   
 jobs:
 
-  e2e-test:
+  test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
     steps:
 
     - name: Setup Go
@@ -53,17 +52,49 @@ jobs:
       run: |
         make test
 
+  push:
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.17
+
+    - name: Cache Go Modules
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Minify Statics
+      uses: nizarmah/auto-minify@v2.1
+      with:
+        overwrite: true
+        maxdepth: 2
+        directory: cmd/app/assets
+
     - name: Capture Variables
       run: |
-        echo "RELEASE_VERSION=$(make version)" >> $GITHUB_ENV
-        echo "SERVICE_NAME=$(make name)" >> $GITHUB_ENV
-
+        echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        
     - id: auth
       name: Get GCP token
-      uses: google-github-actions/auth@v0.4.4
+      uses: google-github-actions/auth@v0.5.0
       with:
           token_format: "access_token"
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          workload_identity_provider: ${{ secrets.IDENTITY_PROVIDER }}
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
     - name: Install Ko
@@ -76,7 +107,7 @@ jobs:
         ko version
         ko login gcr.io --username=oauth2accesstoken --password=${{ steps.auth.outputs.access_token }}
 
-    - name: Tidy Modules Again
+    - name: Tidy Modules
       run: |
         make tidy
 
@@ -84,13 +115,13 @@ jobs:
       run: |
         ko build ./cmd/ --image-refs ./image-digest --bare --tags ${{ env.RELEASE_VERSION }},latest
       env:
-        KO_DOCKER_REPO: gcr.io/${{ secrets.PROJECT_ID }}/${{ env.SERVICE_NAME }}
+        KO_DOCKER_REPO: gcr.io/${{ secrets.PROJECT_ID }}/restme
         GOFLAGS: "-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}"
 
     - name: Install Cosign
       uses: sigstore/cosign-installer@main
       with:
-        cosign-release: 'v1.4.1'
+        cosign-release: v1.4.1
 
     - name: Sign Image
       run: |

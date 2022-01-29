@@ -26,13 +26,13 @@ variable "regions" {
 
 variable "log_level" {
   type        = string
-  description = "Level of logging to use in the container (e.g. panic, fatal, error, warn, info, debug, trace)"
+  description = "level of logging to use in the container (e.g. panic, fatal, error, warn, info, debug, trace)"
   default     = "info"
 }
 
 variable "service_limits" {
   type        = map(string)
-  description = "Resource limits to the container"
+  description = "resource limits to the container"
   default = {
     cpu    = "1000m"
     memory = "512Mi"
@@ -44,7 +44,7 @@ variable "service_ports" {
     name = string
     port = number
   })
-  description = "Port which the container listens to (http1 or h2c)"
+  description = "port which the container listens to (http1 or h2c)"
   default = {
     name = "http1"
     port = 8080

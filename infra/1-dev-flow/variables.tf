@@ -6,7 +6,7 @@ variable "project_id" {
   nullable    = false
 }
 
-variable "repo" {
+variable "git_repo" {
   description = "GitHub Repo"
   type        = string
   nullable    = false
