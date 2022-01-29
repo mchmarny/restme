@@ -4,12 +4,12 @@
         "json": true
     },
     "ip": {
-        "from_header": false,
-        "header_key": ""
+        "from_header": true,
+        "header_key": "forwarded"
     },
     "auth": {
         "tokens": {
-            "dev-user": "e2f1ee16df1ae501e3bf7af246971eef"
+            "demo-user": "96f83affb9ab923262efdf7922f890ef"
         }
     }
 }

@@ -6,12 +6,18 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mchmarny/restme/pkg/config"
 	"github.com/mchmarny/restme/pkg/log"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRequestHandler(t *testing.T) {
-	s := NewService(log.Default())
+	c, err := config.GetConfigFromFile("../../configs/unit.json")
+	assert.NoError(t, err)
+	assert.NotNil(t, c)
+
+	s, err := NewService(log.Default(), c)
+	assert.NoError(t, err)
 	assert.NotNil(t, s)
 
 	r := gin.Default()

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+token=$(openssl rand -hex 16)
+token_with_user="${1}:${token}"
+user_token=$(echo -n $token_with_user | openssl base64)
+
+echo 
+echo 
+echo "add to auth.token in config (e.g. configs/dev.json)"
+echo "\"${1}\": \"${token}\""
+echo 
+echo 
+echo "in curl, "
+echo "token=\"${user_token}\""
+
+

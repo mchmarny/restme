@@ -26,11 +26,13 @@ EOF
 }
 
 main() {
+    local token=$(cat configs/dev.token)
+
     printf "Invoking '${URL}' GET endpoints...\n"
-    test_get_endpoint "${URL}/v1/request/info"
+    test_get_endpoint "${URL}/api/v1/request/info?token=${token}"
 
     printf "Invoking '${URL}' POST endpoints...\n"
-    test_echo_post "${URL}/v1/echo/message"
+    test_echo_post "${URL}/api/v1/echo/message?token=${token}"
 }
 
 main

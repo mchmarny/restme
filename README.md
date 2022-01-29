@@ -171,6 +171,7 @@ image          = "restme"
 secret_version = "latest"
 log_level      = "info"
 alert_email    = "you@domain.com"
+environment    = "prod"
 ```
 
 > Note, the domain must be something you can control DNS for as you will have to create an `A` entry to point to the `IP` in Terraform output for this step. 
@@ -220,3 +221,18 @@ terraform -chdir=infra/2-service destroy
 terraform -chdir=infra/1-dev-flow destroy
 ```
 
+## Tokens
+
+The sample service included in this repo uses authentication token. To configure a token run the [make-token](tools/make-token) script and add the resulting user/token pair to the environment configuration (e.g. [prod](configs/prod.json))
+
+```shell
+tools/make-token demo-user
+```
+
+Will return something similar to this: 
+
+```shell
+"demo-user": "96f83affb9ab923262efdf7922f890ef"
+```
+
+Add that to the `auth.tokens` list in [configs/dev.json](configs/dev.json) or whatever other configuration file you are using. 

@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConfig(t *testing.T) {
+func TestEnv(t *testing.T) {
 	key := "test"
 	expected := time.Now().Format(time.RFC3339Nano)
 	os.Setenv(key, expected)

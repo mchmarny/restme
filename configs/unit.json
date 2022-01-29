@@ -1,0 +1,16 @@
+{
+    "log": {
+        "level": "info",
+        "json": true
+    },
+    "ip": {
+        "from_header": true,
+        "header_key": "forwarded"
+    },
+    "auth": {
+        "tokens": {
+            "user1": "9d2a31419e6c13b9808527e9d25774ef",
+            "user2": "398c6393d6cb9cd9c99713055da0effe"
+        }
+    }
+}

@@ -16,7 +16,7 @@ resource "google_secret_manager_secret" "secret_api_key" {
 }
 
 data "template_file" "config" {
-  template = file("../../configs/dev.json")
+  template = file("../../configs/prod.json")
 }
 
 # API Key Secret version (holds data)

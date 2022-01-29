@@ -7,24 +7,22 @@ import (
 )
 
 const (
-	AppNameDefault    = "restme"
-	AppVersionDefault = "v0.0.1v"
-
-	LogLevelEnvVar = "LOG_LEVEL"
-	LogJSONEnvVar  = "LOG_JSON"
+	nameDefault    = "test"
+	levelDefault   = "debug"
+	versionDefault = "v0.0.1v"
 )
 
 func Default() *Logger {
-	return New(AppNameDefault, AppVersionDefault)
+	return New(nameDefault, versionDefault, levelDefault, false)
 }
 
 // New is a project global creator of logger
-func New(name, version string) *Logger {
+func New(name, version, level string, json bool) *Logger {
 	l := logrus.New()
 	l.SetOutput(os.Stdout)
 	l.SetReportCaller(true)
 
-	if os.Getenv(LogJSONEnvVar) != "" {
+	if json {
 		l.SetFormatter(&logrus.JSONFormatter{})
 	} else {
 		l.SetFormatter(&logrus.TextFormatter{
@@ -33,9 +31,9 @@ func New(name, version string) *Logger {
 		})
 	}
 
-	lev, ok := os.LookupEnv(LogLevelEnvVar)
+	lev, ok := os.LookupEnv(level)
 	if !ok {
-		l.Infof("%s not set, using default: %s", LogLevelEnvVar, logrus.InfoLevel)
+		l.Infof("%s not set, using default: %s", level, logrus.InfoLevel)
 		lev = logrus.InfoLevel.String()
 	}
 

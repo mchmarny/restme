@@ -6,8 +6,10 @@ readonly URL=$1
 readonly VERSION=$2
 
 main() {
+    local token=$(cat configs/dev.token)
     local current=$(curl -H "Content-Type: application/json" \
-                         "${URL}/v1/request/info" | jq -r ".request.version")
+                         "${URL}/api/v1/request/info?token=${token}" \
+                         | jq -r ".request.version")
 
     if [ "$current" != "$VERSION" ]; then
         printf "invalid version, expected: ${VERSION}, got: ${current}\n"

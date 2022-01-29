@@ -4,24 +4,39 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/mchmarny/restme/pkg/config"
 	"github.com/mchmarny/restme/pkg/log"
 )
 
+var (
+	ipRegExp = regexp.MustCompile(`(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`)
+)
+
 // NewRequestService creates new RequestService instance.
-func NewService(logger *log.Logger) *Service {
+func NewService(logger *log.Logger, conf *config.Config) (*Service, error) {
+	if logger == nil {
+		return nil, fmt.Errorf("logger is nil")
+	}
+	if conf == nil {
+		return nil, fmt.Errorf("config is nil")
+	}
+
 	return &Service{
 		logger: logger,
-	}
+		conf:   conf,
+	}, nil
 }
 
 // Service provides object representing the inbound HTTP request.
 type Service struct {
 	logger *log.Logger
+	conf   *config.Config
 }
 
 // RequestHandler handles the inbound requests.
@@ -62,6 +77,12 @@ func (s *Service) getRequestMetadata(c *gin.Context) gin.H {
 		s.logger.Errorf("Error while getting id: %v\n", err)
 	}
 
+	from := c.Request.RemoteAddr
+
+	if s.conf.IP != nil && s.conf.IP.FromHeader {
+		from = parseIPv4FromHeader(c.Request.Header.Get(s.conf.IP.HeaderKey))
+	}
+
 	return gin.H{
 		"id":       id,
 		"time":     time.Now().UTC(),
@@ -70,5 +91,19 @@ func (s *Service) getRequestMetadata(c *gin.Context) gin.H {
 		"protocol": c.Request.Proto,
 		"host":     c.Request.Host,
 		"method":   c.Request.Method,
+		"from":     from,
 	}
+}
+
+func parseIPv4FromHeader(v string) string {
+	if v == "" {
+		return ""
+	}
+
+	ips := ipRegExp.FindAllString(v, -1)
+	if len(ips) > 0 {
+		return ips[0]
+	}
+
+	return ""
 }

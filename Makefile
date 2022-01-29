@@ -26,13 +26,20 @@ lint: ## Lints the entire project
 .PHONY: lint
 
 run: ## Runs uncompiled Go service code
-	LOG_LEVEL=debug ADDRESS=":8080" go run ./cmd/main.go
+	CONFIG=configs/dev.json go run ./cmd/
 .PHONY: run
 
-verify: ## Runs verification test against the running service
-	test/version $(SERVICE_URL) $(RELEASE_VERSION)
-	test/endpoints $(SERVICE_URL)
-.PHONY: verify
+binrun: ## Compile local version of the binary 
+	CGO_ENABLED=0 go build \
+		-ldflags "-X main.version=$(RELEASE_VERSION)" \
+		-mod vendor -o ./bin/restme ./cmd/
+	CONFIG=configs/dev.json ./bin/restme
+.PHONY: binrun
+
+tests: ## Runs verification test against the running service
+	tests/version http://127.0.0.1:8080 $(RELEASE_VERSION)
+	tests/endpoints http://127.0.0.1:8080
+.PHONY: tests
 
 infra1: ## Sets up developer loop (gh, gcr, oidc)
 	terraform -chdir=infra/1-dev-flow apply -var-file=terraform.tfvars
@@ -41,6 +48,10 @@ infra1: ## Sets up developer loop (gh, gcr, oidc)
 infra2: ## Sets up serving (run, secret, policy, monitorng)
 	terraform -chdir=infra/2-service apply -var-file=terraform.tfvars
 .PHONY: infra2
+
+token: ## Prints new dev token 
+	tools/make-token dev-user
+.PHONY: token
 
 tag: ## Creates release tag 
 	git tag $(RELEASE_VERSION)

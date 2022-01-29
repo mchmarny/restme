@@ -47,3 +47,9 @@ variable "alert_email" {
   description = "Email address to which alerts will be sent"
   nullable    = false
 }
+
+variable "environment" {
+  type        = string
+  description = "the environment to deploy to (corresponds to the config file (e.g. configs/prod.json))"
+  default     = "prod"
+}
