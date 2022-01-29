@@ -210,20 +210,9 @@ Assuming everything went OK, you should now be able to test the deployment by us
 url https://your.domain.dev/
 ```
 
-## Clean up
-
-To clean up each of these deployments run the following command:
-
-> Note, the project itself and the external IP address will not be deleted and all APIs enabled as part of these deployments will stay enabled. 
-
-```sh
-terraform -chdir=infra/2-service destroy
-terraform -chdir=infra/1-dev-flow destroy
-```
-
 ## Tokens
 
-The sample service included in this repo uses authentication token. To configure a token run the [make-token](tools/make-token) script and add the resulting user/token pair to the environment configuration (e.g. [prod](configs/prod.json))
+The sample service included with this repo includes token authentication to prevent just anyone on the internet from invoking your demo service. To create new user/token pair run the [make-token](tools/make-token) script and add the resulting  key-value pair to the specific environment configuration (e.g. [prod](configs/prod.json)). 
 
 ```shell
 tools/make-token demo-user
@@ -236,3 +225,16 @@ Will return something similar to this:
 ```
 
 Add that to the `auth.tokens` list in [configs/dev.json](configs/dev.json) or whatever other configuration file you are using. 
+
+> Note, this file is used as content for the Secret Manager which is then configured in Cloud Run service. By default this demo uses the `prod` for Cloud Run deployment but you can change it during the deployment when prompted for the `environment` variable.
+
+## Clean up
+
+To clean up each of these deployments run the following command:
+
+> Note, the project itself and the external IP address will not be deleted and all APIs enabled as part of these deployments will stay enabled. 
+
+```sh
+terraform -chdir=infra/2-service destroy
+terraform -chdir=infra/1-dev-flow destroy
+```
