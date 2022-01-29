@@ -109,7 +109,7 @@ terraform -chdir=infra/1-dev-flow init
 
 2. Apply the configuration
 
-> When promoted for the `GCP Project ID`, enter your existing project code, `GitHub Repo` name, and confirm with `yes` the terraform displayed plan. Alternatively you can use either the command-line variables or a terraform variable file. More on that [here](https://www.terraform.io/language/values/variables).
+> When promoted for the `GCP Project ID`, enter your existing project ID (not the name), `GitHub Repo` name (in username/repo-name format), and confirm with `yes` the terraform displayed plan. Alternatively you can use either the command-line variables or a terraform variable file. More on that [here](https://www.terraform.io/language/values/variables).
 
 ```sh
 terraform -chdir=infra/1-dev-flow apply
@@ -122,25 +122,24 @@ The result of the `apply` command above will look something like this:
 ```shell
 PROJECT_ID = "<id-of-your-project>"
 SERVICE_ACCOUNT = "github-action-publisher@<id-of-your-project>.iam.gserviceaccount.com"
-WORKLOAD_IDENTITY_PROVIDER = "projects/<number-of-your-project>/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+IDENTITY_PROVIDER = "projects/<project-number>/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
 ```
 
 Navigate to your GitHub project [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) and create the following entries with the values returned by the apply command: 
 
 * `PROJECT_ID`
 * `SERVICE_ACCOUNT`
-* `WORKLOAD_IDENTITY_PROVIDER`
+* `IDENTITY_PROVIDER`
 
 4. Test GitHub Workflow 
 
 Now, whenever you create a version tag (`v*`) in your repo, GitHub will run the [image-on-tag.yaml](.github/workflows/image-on-tag.yaml) action which will build, publish, and sign (using cosign) your container image in GCR. 
 
-> Assuming you have not already created a git tag with this version
+> This assumes you have not already created a git tag with this v0.0.1 version
 
 ```shell
-# $(shell cat version)
-git tag v0.8.17
-git push origin v0.8.17
+git tag v0.0.1
+git push origin v0.0.1
 ```
 
 ## Cloud Run Service Deployment

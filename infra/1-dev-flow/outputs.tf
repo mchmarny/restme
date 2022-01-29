@@ -10,7 +10,7 @@ output "SERVICE_ACCOUNT" {
   description = "Service account to use in GitHub Action for federated auth."
 }
 
-output "WORKLOAD_IDENTITY_PROVIDER" {
+output "IDENTITY_PROVIDER" {
   value       = google_iam_workload_identity_pool_provider.github_provider.name
   description = "Provider ID to use in Auth action for GCP in GitHub."
 }
