@@ -78,13 +78,6 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v2
 
-    - name: Minify Statics
-      uses: nizarmah/auto-minify@v2.1
-      with:
-        overwrite: true
-        maxdepth: 2
-        directory: cmd/app/assets
-
     - name: Capture Variables
       run: |
         echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
