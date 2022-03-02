@@ -29,7 +29,7 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Checkout Code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Tidy Modules
       run: |
@@ -76,7 +76,7 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Checkout Code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Capture Variables
       run: |
