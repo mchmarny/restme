@@ -91,7 +91,7 @@ jobs:
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
     - name: Install Ko
-      uses: imjasonh/setup-ko@v0.4
+      uses: imjasonh/setup-ko@v0.6
       with:
         version: tip
         
