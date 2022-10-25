@@ -37,7 +37,7 @@ jobs:
 
     - name: Config Lint
       id: golangci_config
-      uses: andstor/file-existence-action@v1
+      uses: andstor/file-existence-action@v2
       with:
         files: .golangci.yaml
 
