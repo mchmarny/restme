@@ -1,5 +1,5 @@
 VERSION    :=$(shell cat .version)
-YAML_FILES :=$(shell find . -type f -regex ".*yaml" -print)
+YAML_FILES :=$(shell find . -type f -regex ".*y*ml" -print)
 
 all: help
 
