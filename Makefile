@@ -52,15 +52,6 @@ tagless: ## Delete the current release tag
 	git push --delete origin $(VERSION)
 .PHONY: tagless
 
-.PHONY: setup
-setup: ## Creates the GCP resources 
-	terraform -chdir=./infra init
-	terraform -chdir=./infra apply -auto-approve
-
-.PHONY: apply
-apply: ## Applies Terraform
-	terraform -chdir=./infra apply -auto-approve
-
 clean: ## Cleans bin and temp directories
 	go clean
 	rm -fr ./vendor

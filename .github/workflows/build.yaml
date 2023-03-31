@@ -1,0 +1,104 @@
+name: build_image
+
+on:
+  workflow_call:
+    inputs:
+      image_repo:
+        description: 'Fully-qualified image repo (registry/project/repo)'
+        required: true
+        type: string
+      image_name:
+        description: 'Image name (e.g. my-image)'
+        required: true
+        type: string
+      auth_provider:
+        description: 'OIDC provider ID'
+        required: true
+        type: string
+      auth_user:
+        description: 'OIDC user ID'
+        required: true
+        type: string
+      go_version:
+        description: 'Go version to use'
+        required: false
+        type: string
+        default: '1.20.2'
+    outputs:
+      digest:
+        value: ${{ jobs.build.outputs.digest }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    outputs:
+      digest: ${{ steps.image.outputs.digest }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      id-token: write
+    steps:
+
+    - name: Setup Go
+      uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9  # v4.0.0
+      with:
+        go-version: '${{ inputs.go_version }}'
+
+    - run: go version
+
+    - name: Cache Go Modules
+      uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8  # v3.3.1
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Checkout Code
+      uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3  # v3.5.0
+
+    - name: Tidy Modules
+      run: |
+        go mod tidy
+        go mod vendor
+
+    - id: auth
+      name: Auth GCP
+      uses: google-github-actions/auth@ef5d53e30bbcd8d0836f4288f5e50ff3e086997d  # v1.0.0
+      with:
+        token_format: "access_token"
+        workload_identity_provider: ${{ inputs.auth_provider }}
+        service_account: ${{ inputs.auth_user }}
+
+    - name: Install ko
+      uses: ko-build/setup-ko@ace48d793556083a76f1e3e6068850c1f4a369aa  # v0.6
+
+    - name: Authenticate ko
+      env:
+        AUTH_TOKEN: ${{ steps.auth.outputs.access_token }}
+      run: |
+        set -euo pipefail
+        reg=$(echo ${{ inputs.image_repo }} | cut -d/ -f1)
+        echo "${AUTH_TOKEN}" | ko login ${reg} --username oauth2accesstoken --password-stdin
+
+    - name: Get Version
+      run: |
+        set -euo pipefail
+        echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+    # Note: ko build image ref will include BOTH, the tag AND digest of the image.
+    # ThTechnically not well formed but most of the tools seem to parse it as digest.
+    - name: Build Image
+      id: image
+      env:
+        KO_DOCKER_REPO: ${{ inputs.image_repo }}/${{ inputs.image_name }}
+        GOFLAGS: "-ldflags=-X=main.version=${{ env.RELEASE_VERSION }}"
+        COSIGN_EXPERIMENTAL: "true"
+      run: |
+        set -euo pipefail
+        ko build cmd/server/main.go --image-refs .digest --bare --tags ${{ env.RELEASE_VERSION }}
+        echo "digest=$(cat .digest)" >> "$GITHUB_OUTPUT"

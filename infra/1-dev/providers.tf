@@ -1,5 +1,6 @@
-# Required terraform and GCP provider versions
+# Description: This file contains the provider configuration for the project
 
+# Configure the Google Cloud provider
 terraform {
   required_version = ">= 1.1"
 
@@ -16,10 +17,12 @@ terraform {
   }
 }
 
+# Configure the Google Cloud provider
 provider "google" {
   project = var.project_id
 }
 
+# Configure the beta version of Google Cloud provider
 provider "google-beta" {
   project = var.project_id
 }
