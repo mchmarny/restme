@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -64,7 +65,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), serverShutdownWaitSeconds*time.Second)
 	defer cancel()
 
-	if err := s.Shutdown(ctx); err != nil && err != http.ErrServerClosed {
+	if err := s.Shutdown(ctx); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		logger.Fatalf("server shutdown failed: %+v", err)
 	}
 }

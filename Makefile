@@ -1,9 +1,10 @@
-RELEASE_VERSION ?=$(shell cat version)
+VERSION    :=$(shell cat .version)
+YAML_FILES :=$(shell find . -type f -regex ".*yaml" -print)
 
 all: help
 
-version: ## Outputs current verison
-	@echo $(RELEASE_VERSION)
+version: ## Prints the current version
+	@echo $(VERSION)
 .PHONY: version
 
 tidy: ## Updates the go modules and vendors all dependancies 
@@ -17,46 +18,48 @@ upgrade: ## Upgrades all dependancies
 	go mod vendor
 .PHONY: upgrade
 
-test: ## Runs tests on the entire project 
+test: tidy ## Runs unit tests
 	go test -count=1 -race -covermode=atomic -coverprofile=cover.out ./...
 .PHONY: test
 
-lint: ## Lints the entire project 
-	golangci-lint -c .golangci.yaml run --timeout=3m
 .PHONY: lint
+lint: lint-go lint-yaml lint-tf ## Lints the entire project 
+	@echo "Completed Go and YAML lints"
 
-run: ## Runs uncompiled Go service code
-	CONFIG=configs/dev.json go run ./cmd/
-.PHONY: run
+.PHONY: lint
+lint-go: ## Lints the entire project using go 
+	golangci-lint -c .golangci.yaml run
 
-binrun: ## Compile local version of the binary 
-	CGO_ENABLED=0 go build \
-		-ldflags "-X main.version=$(RELEASE_VERSION)" \
-		-mod vendor -o ./bin/restme ./cmd/
-	CONFIG=configs/dev.json ./bin/restme
-.PHONY: binrun
+.PHONY: lint-yaml
+lint-yaml: ## Runs yamllint on all yaml files (brew install yamllint)
+	yamllint -c .yamllint $(YAML_FILES)
 
-tests: ## Runs verification test against the running service
-	tests/version http://127.0.0.1:8080 $(RELEASE_VERSION)
-	tests/endpoints http://127.0.0.1:8080
-.PHONY: tests
+.PHONY: lint-tf
+lint-tf: ## Runs terraform fmt on all terraform files
+	terraform -chdir=./infra fmt
 
-infra1: ## Sets up developer loop (gh, gcr, oidc)
-	terraform -chdir=infra/1-dev-flow apply -var-file=terraform.tfvars
-.PHONY: infra1
-
-infra2: ## Sets up serving (run, secret, policy, monitorng)
-	terraform -chdir=infra/2-service apply -var-file=terraform.tfvars
-.PHONY: infra2
-
-token: ## Prints new dev token 
-	tools/make-token dev-user
-.PHONY: token
+server: ## Runs uncompiled app 
+	LOG_LEVEL=debug go run cmd/server/main.go
+.PHONY: server
 
 tag: ## Creates release tag 
-	git tag $(RELEASE_VERSION)
-	git push origin $(RELEASE_VERSION)
+	git tag -s -m "version bump to $(VERSION)" $(VERSION)
+	git push origin $(VERSION)
 .PHONY: tag
+
+tagless: ## Delete the current release tag 
+	git tag -d $(VERSION)
+	git push --delete origin $(VERSION)
+.PHONY: tagless
+
+.PHONY: setup
+setup: ## Creates the GCP resources 
+	terraform -chdir=./infra init
+	terraform -chdir=./infra apply -auto-approve
+
+.PHONY: apply
+apply: ## Applies Terraform
+	terraform -chdir=./infra apply -auto-approve
 
 clean: ## Cleans bin and temp directories
 	go clean

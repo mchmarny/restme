@@ -4,8 +4,11 @@ updates:
   directory: "/"
   schedule:
     interval: "daily"
-
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:
     interval: "daily"
+- directory: /
+  package-ecosystem: "terraform"
+  schedule:
+    timezone: "daily"
