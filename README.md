@@ -1,5 +1,7 @@
 # restme
 
+> Consider using [s3cme](https://github.com/mchmarny/s3cme). More complete template Go app repo with image build/publish pipelines, SBOM, and SLSA provenance using OIDC and Artifact Registry.
+
 Template to bootstrap a fully functional, multi-region, REST service on GCP with a developer release pipeline.
 
 ## Provisioned
